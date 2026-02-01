@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Ôn Tập Sinh Lý & Xét Nghiệm Máu - Tiến Minh</title>
+  <style>
+header h1 {
+  background: linear-gradient(90deg, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+/* Tab Thi thử - Đổi màu nút */
+#page-tiendo button {
+  transition: all 0.3s ease;
+  color: white;
+  font-weight: bold;
+}
+
+#page-tiendo #examPrev {
+  background: #60a5fa !important;  /* Xanh dương nhạt */
+}
+
+#page-tiendo #examNext {
+  background: #3b82f6 !important;  /* Xanh dương đậm */
+}
+
+#page-tiendo #examCheck {
+  background: #059669 !important;  /* Xanh lá đậm */
+}
+
+#page-tiendo #examShow {
+  background: #f97316 !important;  /* Cam nổi bật */
+}
+
+#page-tiendo #submitExam {
+  background: #dc2626 !important;  /* Đỏ đậm - Nộp bài */
+}
+
+/* Tab Ôn theo bộ đề - Đổi màu nút */
+#page-bode button {
+  transition: all 0.3s ease;
+  color: white;
+  font-weight: bold;
+}
+
+#page-bode #boDePrev {
+  background: #60a5fa !important;
+}
+
+#page-bode #boDeNext {
+  background: #3b82f6 !important;
+}
+
+#page-bode #boDeCheck {
+  background: #059669 !important;
+}
+
+#page-bode #boDeShow {
+  background: #f97316 !important;
+}
+
+/* Hover chung cho 2 tab (làm nút nổi bật khi rê chuột) */
+#page-tiendo button:hover,
+#page-bode button:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+}
+/* Ôn theo bộ đề - Sidebar chọn bộ */
+#boDeList .bo-de-item {
+  padding: 10px;
+  margin: 5px 0;
+  background: #f1f5f9;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#boDeList .bo-de-item.active,
+#boDeList .bo-de-item:hover {
+  background: #dbeafe;
+}
+
+/* Sidebar Flashcard - Giới hạn active chỉ trong sidebar */
+#flashSections .question-list li.active {
+  background: #dbeafe;
+  font-weight: bold;
+}
+
+/* Flashcard sạch sẽ, không scrollbar thừa */
+#flashcard {
+  max-width: 100%;
+  width: 90%;
+  min-height: 350px;
+  max-height: 70vh;
+  margin: 20px auto;
+  padding: 40px 30px;
+  font-size: 1.9em;
+  line-height: 1.5;
+  border-radius: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  user-select: none;
+  overflow-x: hidden !important;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+#flashcard:hover {
+  transform: scale(1.015);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+}
+
+#page-flashcard .card {
+  height: 100%;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 20px;
+}
+
+.sidebar {
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+#page-flashcard {
+  overflow: hidden;
+}
+
+/* FIX SCROLL & NÚT BỊ ẨN Ở DƯỚI */
+body {
+  overflow-y: auto !important; /* cho phép scroll dọc */
+  height: auto !important;     /* bỏ ràng buộc 100vh cứng */
+  min-height: 100vh;           /* vẫn full màn hình tối thiểu */
+}
+
+.container {
+  min-height: calc(100vh - 80px); /* trừ chiều cao header để nội dung vừa khít */
+  overflow-y: auto;
+  padding-bottom: 40px; /* thêm khoảng trống dưới cùng */
+}
+
+.page {
+  min-height: 100%; /* mỗi trang chiếm đủ chiều cao */
+}
+
+.card {
+  margin-bottom: 60px; /* thêm khoảng trống dưới card để nút không sát đáy */
+}
+
+/* Đặc biệt cho Flashcard: đảm bảo nút luôn ở dưới và scroll được */
+#page-flashcard .card {
+  min-height: 70vh; /* card flashcard cao vừa đủ */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#page-flashcard .buttons {
+  margin-top: auto; /* đẩy nút xuống dưới cùng card */
+  padding-bottom: 20px;
+}
+  :root {
+    --primary: #1e40af;
+    --primary-dark: #1e3a8a;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #1f2937;
+    --gray: #6b7280;
+  }
+
+  body.dark {
+    --bg: #111827;
+    --card: #1f2937;
+    --text: #f3f4f6;
+    --gray: #9ca3af;
+  }
+
+  body { 
+    font-family: Arial, sans-serif; 
+    background: var(--bg); 
+    color: var(--text); 
+    margin: 0; 
+    height: 100vh; /* full chiều cao màn hình */
+    transition: background 0.3s, color 0.3s;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: var(--primary);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    flex-shrink: 0; /* header không co lại */
+  }
+
+  nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 25px;
+  }
+
+  nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background 0.2s;
+  }
+
+  nav a:hover, nav a.active {
+    background: rgba(255,255,255,0.2);
+  }
+
+  .toggle-dark {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+    flex: 1; /* chiếm hết không gian còn lại */
+    overflow: hidden;
+  }
+
+  .page {
+    display: none;
+    height: 100%;
+  }
+
+  .page.active {
+    display: block;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+
+  h1, h2 { color: var(--primary); }
+
+  .progress { 
+    text-align: center; 
+    font-size: 1.2em; 
+    margin: 15px 0; 
+    color: var(--gray); 
+  }
+
+  .question { 
+    font-size: 1.45em; 
+    line-height: 1.6; 
+    margin: 30px 0; 
+  }
+
+  .blank { 
+    color: #dc2626; 
+    font-weight: bold; 
+    background: #fee2e2; 
+    padding: 4px 10px; 
+    border-radius: 6px; 
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.25em;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    margin: 15px 0;
+    box-sizing: border-box;
+  }
+
+  .buttons { 
+    display: flex; 
+    gap: 12px; 
+    justify-content: center; 
+    flex-wrap: wrap; 
+    margin: 25px 0; 
+  }
+
+  button {
+    padding: 12px 24px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    transition: 0.2s;
+  }
+
+  #check { background: #10b981; }
+  #show { background: #f59e0b; }
+  #prev, #next { background: #6b7280; }
+  #shuffle { background: #3b82f6; }
+  button:hover { filter: brightness(0.9); }
+
+  #result { 
+    font-size: 1.4em; 
+    font-weight: bold; 
+    margin: 20px 0; 
+    padding: 20px; 
+    border-radius: 8px; 
+    text-align: center; 
+  }
+
+  .correct { background: #d1fae5; color: #065f46; }
+  .wrong { background: #fee2e2; color: #991b1b; }
+
+  /* Sidebar cho Ôn điền khuyết */
+  .sidebar { 
+    width: 300px; 
+    background: var(--card); 
+    border-right: 1px solid #e5e7eb; 
+    overflow-y: auto; 
+    padding: 15px; 
+    flex-shrink: 0;
+  }
+
+  .search-box { 
+    width: 100%; 
+    padding: 10px; 
+    margin-bottom: 15px; 
+    border: 1px solid #d1d5db; 
+    border-radius: 6px; 
+  }
+
+  .section-header { 
+    padding: 10px; 
+    background: #f1f5f9; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    margin: 8px 0; 
+  }
+
+  .question-list { 
+    list-style: none; 
+    padding: 0; 
+    display: none; 
+  }
+
+  .question-list.open { display: block; }
+
+  .question-list li { 
+    padding: 8px 12px; 
+    cursor: pointer; 
+    border-radius: 4px; 
+  }
+
+  .question-list li:hover, .question-list li.active { 
+    background: #dbeafe; 
+  }
+
+  /* Flashcard - nền + nút */
+  #flashcard.front {
+    background: linear-gradient(135deg, #fefce8, #fef08a); /* vàng nhạt ấm */
+    color: #1e293b;
+    border: 2px solid #fbbf24;
+  }
+
+  #flashcard.back {
+    background: linear-gradient(135deg, #e0f2fe, #7dd3fc); /* xanh dương nhạt mát */
+    color: #1e40af;
+    border: 2px solid #3b82f6;
+  }
+
+  #flashcard:hover {
+    transform: scale(1.02);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+  }
+
+  /* Nút Flashcard - màu mới */
+  .flash-btn {
+    padding: 14px 32px;
+    font-size: 1.15em;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+
+  .flash-btn.prev, .flash-btn.next {
+    background: #64748b; /* xám đậm */
+    color: white;
+  }
+
+  .flash-btn.prev:hover, .flash-btn.next:hover {
+    background: #475569;
+    transform: translateY(-2px);
+  }
+
+  .flash-btn.flip {
+    background: #f97316; /* cam nổi bật */
+    color: white;
+    font-size: 1.25em;
+  }
+
+  .flash-btn.flip:hover {
+    background: #ea580c;
+    transform: scale(1.08);
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
+  }
+
+  .flash-btn.shuffle {
+    background: #8b5cf6; /* tím nhẹ */
+    color: white;
+  }
+
+  .flash-btn.shuffle:hover {
+    background: #7c3aed;
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 992px) {
+    body { flex-direction: column; }
+    .sidebar { 
+      width: 100%; 
+      height: 40vh; 
+      border-right: none; 
+      border-bottom: 1px solid #e5e7eb; 
+    }
+    .container { padding: 15px; }
+  }
+/* Thi thử */
+#timer {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #ef4444;
+  text-align: center;
+  margin: 10px 0;
+}
+
+#examProgress {
+  text-align: center;
+  font-size: 1.2em;
+  color: var(--gray);
+}
+
+#examResult {
+  background: #f0fdf4;
+  border: 2px solid #10b981;
+}
+
+#examResult.wrong-heavy {
+  background: #fee2e2;
+  border-color: #ef4444;
+}
+
+#answerDetails {
+  margin-top: 15px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.answer-item {
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.answer-correct { background: #d1fae5; }
+.answer-wrong   { background: #fee2e2; }
+
+/* Fix chữ sidebar khi dark mode - đảm bảo chữ luôn rõ */
+body.dark .sidebar,
+body.dark .sidebar * {
+  color: #e2e8f0 !important;  /* Chữ sáng rõ trên nền tối */
+}
+
+body.dark .section-header {
+  background: #334155 !important;  /* Nền xám đậm hơn cho header */
+  color: #f1f5f9 !important;       /* Chữ trắng sáng */
+}
+
+body.dark .question-list li {
+  color: #cbd5e1 !important;       /* Chữ xám nhạt dễ đọc */
+}
+
+body.dark .question-list li:hover,
+body.dark .question-list li.active {
+  background: #475569 !important;  /* Hover/active nổi bật */
+  color: #ffffff !important;
+}
+
+/* Fix input và placeholder trong dark mode */
+body.dark input[type="text"] {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+  border-color: #475569 !important;
+}
+
+body.dark input[type="text"]::placeholder {
+  color: #94a3b8 !important;  /* Placeholder xám nhạt */
+}
+
+/* Fix các phần khác nếu cần (kết quả đúng/sai) */
+body.dark .correct {
+  background: rgba(16,185,129,0.2) !important;
+  color: #6ee7b7 !important;
+  border-color: #10b981 !important;
+}
+
+body.dark .wrong {
+  background: rgba(239,68,68,0.2) !important;
+  color: #fca5a5 !important;
+  border-color: #ef4444 !important;
+}
+
+/* Fix chữ sidebar trong tab Ôn theo bộ đề khi dark mode */
+body.dark #page-bode .sidebar,
+body.dark #page-bode .sidebar * {
+  color: #f1f5f9 !important;  /* Đổi thành trắng sáng hơn, dễ đọc */
+}
+
+body.dark #page-bode .section-header {
+  background: #334155 !important;  /* Nền header xám đậm */
+  color: #ffffff !important;       /* Chữ trắng đậm */
+  border-bottom: 1px solid #475569;
+}
+
+body.dark #page-bode .question-list li {
+  color: #ffffff !important;       /* Chữ trắng hoàn toàn cho danh sách câu */
+  padding: 10px 12px;
+  border-bottom: 1px solid #475569;
+}
+
+body.dark #page-bode .question-list li:hover,
+body.dark #page-bode .question-list li.active {
+  background: #0ea5e9 !important;  /* Hover/active xanh dương nổi bật */
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+/* Input tìm kiếm trong sidebar bộ đề */
+body.dark #page-bode .search-box {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border: 1px solid #475569 !important;
+}
+
+body.dark #page-bode .search-box::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Tiêu đề "Chọn bộ đề" và các text khác trong sidebar */
+body.dark #page-bode .sidebar h2 {
+  color: #60a5fa !important;  /* Màu xanh dương nổi bật cho tiêu đề */
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Ôn Tập TT.Sinh Lý 1</h1>
+  <nav>
+    <ul>
+      <li><a id="nav-home" class="active">Home</a></li>
+      <li><a id="nav-dienkhuyet">Điền khuyết</a></li>
+      <li><a id="nav-flashcard">Flashcard</a></li>
+      <li><a id="nav-tracnghiem">Trắc nghiệm</a></li>
+      <li><a id="nav-tiendo">Thi thử</a></li>
+      <li><a id="nav-bode">Ôn theo bộ đề</a></li>
+    </ul>
+  </nav>
+  <button class="toggle-dark" id="toggleDark">🌙 Dark Mode</button>
+</header>
+
+<div class="container">
+
+  <!-- Trang Home -->
+  <div id="page-home" class="page active">
+    <div class="card">
+      <h2>Chào mừng bạn đến với trang ôn tập do Minh Tiến phát triển!</h2>
+      <p>Chọn chế độ ôn bên trên để bắt đầu:</p>
+      <ul>
+        <li><strong>Điền khuyết</strong>: Gõ đáp án vào chỗ trống</li>
+        <li><strong>Flashcard</strong>: Lật thẻ để xem đáp án</li>
+        <li><strong>Trắc nghiệm</strong>: Chọn đáp án đúng (đang phát triển)</li>
+        <li><strong>Tiến độ</strong>: Xem câu nào đã làm đúng/sai</li>
+      </ul>
+      <p>Số câu hỏi hiện tại: <strong id="totalQuestions">0</strong></p>
+    </div>
+  </div>
+
+  <!-- Trang Ôn điền khuyết -->
+  <div id="page-dienkhuyet" class="page">
+    <div style="display: flex; gap: 20px;">
+      <div class="sidebar">
+        <h2>Danh sách câu hỏi</h2>
+        <input type="text" id="searchInput" class="search-box" placeholder="Tìm câu hỏi..." />
+        <div id="sections"></div>
+      </div>
+      <div style="flex: 1;">
+        <div class="progress">Câu <span id="current">1</span> / <span id="total">0</span></div>
+        <div class="card">
+          <div class="question" id="question"></div>
+          <input type="text" id="userInput" placeholder="Gõ đáp án vào đây..." autocomplete="off" />
+          <div class="buttons">
+            <button id="prev">Câu trước</button>
+            <button id="check">Kiểm tra</button>
+            <button id="show">Hiện đáp án</button>
+            <button id="next">Câu tiếp</button>
+            <button id="shuffle">Trộn ngẫu nhiên</button>
+
+          </div>
+          <div id="result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trang Flashcard (đã chỉnh màu đẹp hơn) -->
+<!-- Trang Flashcard - Đã thêm tìm kiếm & danh sách câu hỏi -->
+<div id="page-flashcard" class="page">
+  <div style="display: flex; gap: 20px; height: 100%;">
+    <!-- Sidebar Flashcard -->
+    <div class="sidebar" style="width: 280px; height: 100%; overflow-y: auto;">
+      <h2>Danh sách câu (Flashcard)</h2>
+      <input type="text" id="flashSearchInput" class="search-box" placeholder="Tìm câu hỏi..." />
+      <div id="flashSections"></div>
+    </div>
+
+    <!-- Nội dung chính -->
+    <div style="flex: 1;">
+      <div class="card" style="text-align: center; max-width: 900px; margin: 0 auto; height: 100%; display: flex; flex-direction: column;">
+        <h2>Flashcard - Lật thẻ để xem đáp án</h2>
+        
+        <div id="flashcard" class="front" style="
+          font-size: 2.2em; 
+          line-height: 1.5; 
+          margin: 30px auto; 
+          padding: 60px 40px; 
+          border-radius: 16px; 
+          cursor: pointer; 
+          min-height: 300px; 
+          flex: 1; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center; 
+          transition: all 0.4s ease;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+          user-select: none;
+        ">
+          Click để lật thẻ
+        </div>
+
+        <div class="buttons" style="margin-top: 20px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; padding-bottom: 20px;">
+          <button id="flashPrev" class="flash-btn prev">Trước</button>
+          <button id="flashFlip" class="flash-btn flip">Lật thẻ</button>
+          <button id="flashNext" class="flash-btn next">Tiếp</button>
+          <button id="flashShuffle" class="flash-btn shuffle">Trộn</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>  
+
+<!-- Trang Trắc nghiệm (mẫu) -->
+  <div id="page-tracnghiem" class="page">
+    <div class="card">
+      <h2>Trắc nghiệm (đang phát triển)</h2>
+      <p>Chưa có dữ liệu trắc nghiệm. Bạn có thể cung cấp đáp án A/B/C/D để mình thêm vào nhé!</p>
+    </div>
+  </div>
+
+  <!-- Trang Thi thử (thay thế Tiến độ) -->
+<div id="page-tiendo" class="page">
+  <div class="card">
+    <h2>Thi thử Điền khuyết (20 câu - 10 phút)</h2>
+    <p id="timer">Thời gian: <span id="timeLeft">10:00</span></p>
+    <p id="examProgress">Câu <span id="examCurrent">1</span> / 20</p>
+
+    <div id="examQuestion" class="question"></div>
+    <input type="text" id="examInput" placeholder="Gõ đáp án vào đây..." autocomplete="off" />
+
+    <div class="buttons">
+      <button id="examPrev">Câu trước</button>
+      <button id="examCheck">Kiểm tra</button>
+      <button id="examShow">Hiện đáp án</button>
+      <button id="examNext">Câu tiếp</button>
+      <button id="submitExam" style="background: #ef4444;">Nộp bài</button>
+    </div>
+
+    <div id="examResult" style="display: none; margin-top: 20px; padding: 20px; border-radius: 12px;">
+      <h3>Kết quả thi</h3>
+      <p id="scoreText"></p>
+      <div id="answerDetails"></div>
+      <button id="restartExam" style="margin-top: 20px; background: #3b82f6;">Thi lại</button>
+    </div>
+  </div>
+</div>
+<!-- Trang Ôn theo bộ đề -->
+<div id="page-bode" class="page">
+  <div style="display: flex; gap: 20px; height: 100%;">
+    <!-- Sidebar chọn bộ đề -->
+    <div class="sidebar" style="width: 280px; height: 100%; overflow-y: auto;">
+      <h2>Chọn bộ đề</h2>
+      <div id="boDeList"></div>
+    </div>
+
+    <!-- Nội dung ôn bộ đề (giống Điền khuyết) -->
+    <div style="flex: 1;">
+      <div class="progress">Bộ <span id="boDeCurrent">1</span> - Câu <span id="currentInBo">1</span> / <span id="totalInBo">50</span></div>
+      <div class="card">
+        <div class="question" id="boDeQuestion"></div>
+        <input type="text" id="boDeInput" placeholder="Gõ đáp án vào đây..." autocomplete="off" />
+        <div class="buttons">
+          <button id="boDePrev">Câu trước</button>
+          <button id="boDeCheck">Kiểm tra</button>
+          <button id="boDeShow">Hiện đáp án</button>
+          <button id="boDeNext">Câu tiếp</button>
+        </div>
+        <div id="boDeResult"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<
+<script>
+// === MẢNG CÂU HỎI ===
+const questions = [
+  { q: "Thí nghiệm của Dutrochet sử dụng một chuông đựng nước đường có đáy là màng __________. ", a: "bán thấm" },
+  { q: "Màng bán thấm trong thí nghiệm Dutrochet cho __________ đi qua nhưng ngăn các __________. ", a: "dung môi – chất hòa tan" },
+  { q: "Khi dung dịch ưu trương hút dung dịch nhược trương cho đến khi đẳng trương, lực hút này được gọi là __________ của dung dịch.", a: "áp suất thẩm thấu" },
+  { q: "Dung dịch nào chứa càng nhiều chất hòa tan thì áp suất thẩm thấu của dung dịch đó càng __________. ", a: "cao" },
+  { q: "Trong thí nghiệm Hamburger, màng bán thấm được sử dụng là màng __________. ", a: "hồng cầu" },
+  { q: "Dung dịch NaCl đẳng trương với tế bào chất hồng cầu có nồng độ __________. ", a: "9/1000" },
+  { q: "Ở ống nghiệm có NaCl 10/1000, hồng cầu sẽ bị __________ do dung môi đi ra khỏi tế bào.", a: "teo lại" },
+  { q: "Khi dung dịch ngày càng nhược trương so với tế bào chất hồng cầu, dung môi sẽ đi __________ hồng cầu làm hồng cầu phình ra.", a: "vào" },
+  { q: "Nồng độ NaCl mà tại đó số hồng cầu vỡ bằng số hồng cầu chưa vỡ được gọi là __________. ", a: "nồng độ tiêu huyết giới hạn" },
+  { q: "Trị số bình thường của máu người, ống tiêu huyết tối thiểu có nồng độ __________ và ống tiêu huyết tối đa có nồng độ __________. ", a: "6,5/1000 – 3,5/1000" },
+  { q: "Các dung dịch truyền vào máu phải __________ với tế bào hồng cầu, ví dụ NaCl __________ hoặc Glucose __________. ", a: "đẳng trương – 9/1000 – 5/100" },
+  { q: "Trong thí nghiệm Dutrochet, sau một thời gian mực nước trong chuông tăng từ __________ lên __________. ", a: "a – b" },
+  { q: "Áp suất thẩm thấu của dung dịch được cân bằng bởi __________ của cột nước dâng cao.", a: "áp suất thủy tĩnh" },
+  { q: "Thí nghiệm Hamburger là sự lặp lại thí nghiệm Dutrochet nhưng sử dụng màng __________ làm màng bán thấm.", a: "hồng cầu" },
+  { q: "Số lượng ống nghiệm được sử dụng trong thí nghiệm Hamburger là __________ ống.", a: "10" },
+  { q: "Dụng cụ dùng để hút dung dịch với thể tích lớn trong thí nghiệm là __________. ", a: "ống hút 10 ml" },
+  { q: "Trong mỗi ống nghiệm của thí nghiệm Hamburger, lượng máu được cho vào là __________. ", a: "2 giọt" },
+  { q: "Khi hòa tan máu trong dung dịch, thao tác chúc ngược ống nghiệm được thực hiện __________ lần và không được __________ mạnh.", a: "2 – lắc" },
+  { q: "Ở ống số 9, số dung môi ra vào hồng cầu __________ nhau nên thể tích hồng cầu __________. ", a: "bằng – không thay đổi" },
+  { q: "Ở các ống có nồng độ NaCl thấp dần từ 8/1000 đến 1/1000, dung dịch ngày càng __________ so với tế bào chất hồng cầu.", a: "nhược trương" },
+  { q: "Khi hồng cầu phình ra quá mức ở một nồng độ NaCl nhất định, hiện tượng xảy ra là __________. ", a: "vỡ hồng cầu (tiêu huyết)" },
+  { q: "Ống tiêu huyết giới hạn được nhận ra nhờ độ trong suốt nằm giữa hai dãy ống __________ và __________. ", a: "trong – đục" },
+  { q: "Khi các ống có cùng áp suất thẩm thấu thì hiện tượng tiêu huyết sẽ xuất hiện ở các ống __________ nhau.", a: "tương ứng" },
+  { q: "Dựa vào hiện tượng tiêu huyết, có thể suy ra __________ của một dung dịch X.", a: "áp suất thẩm thấu" },
+  { q: "Dung dịch X được pha theo cách tương tự dung dịch __________. ", a: "NaCl 10/1000" },
+  { q: "Các ống nghiệm pha dung dịch X có nồng độ từ __________ đến __________. ", a: "X/10 – X" },
+  { q: "Nếu ống tiêu huyết giới hạn xảy ra ở ống số 2 thì 2X/10 sẽ đẳng trương với dung dịch __________ NaCl.", a: "5/1000" },
+  { q: "Từ đó suy ra dung dịch X đẳng trương với dung dịch NaCl __________. ", a: "25/1000" },
+  { q: "Không được kết luận dung dịch X là NaCl 25/1000 vì X có thể là dung dịch chứa __________ khác.", a: "chất hòa tan" },
+  { q: "Để xác định độ bền vững của màng hồng cầu, các ống nghiệm sau khi pha NaCl được đem __________. ", a: "ly tâm" },
+  { q: "Việc xác định ống tiêu huyết tối thiểu và tối đa dựa trên __________ và __________ sau ly tâm.", a: "màu sắc – cặn lắng" },
+  { q: "Ống tiêu huyết tối thiểu phản ánh __________ của màng hồng cầu.", a: "độ bền vững" },
+  { q: "Khi hồng cầu kém bền vững, hiện tượng tiêu huyết sẽ xảy ra ở các nồng độ NaCl __________ hơn bình thường.", a: "cao" },
+  { q: "Các dung dịch truyền vào máu bắt buộc phải __________ với tế bào hồng cầu để tránh tiêu huyết.", a: "đẳng trương" },
+  { q: "Hai dung dịch thường dùng làm dung dịch đẳng trương truyền máu là __________ và __________. ", a: "NaCl 9/1000 – Glucose 5/100" },
+  { q: "Khi cơ thể mất một lượng máu và cần bù lại, người ta thường chủ động __________. ", a: "truyền máu" },
+  { q: "Khi truyền máu từ người này sang người khác có thể xảy ra phản ứng __________ hoặc __________. ", a: "ngưng kết – tiêu huyết" },
+  { q: "Các phản ứng ngưng kết hoặc tiêu huyết khi truyền máu có thể gây __________ nếu không tuân thủ nguyên tắc truyền máu.", a: "tử vong" },
+  { q: "Nguyên nhân gây phản ứng truyền máu là do trên màng hồng cầu của mỗi người có __________ khác nhau.", a: "kháng nguyên" },
+  { q: "Kháng thể trong huyết tương của nhóm máu này có thể phản ứng với __________ trên màng hồng cầu nhóm máu khác.", a: "kháng nguyên" },
+  { q: "Để tránh tai biến truyền máu cần xác định trước __________ và __________ trong máu người cho và người nhận.", a: "kháng nguyên – kháng thể" },
+  { q: "Việc phân loại nhóm máu dựa trên sự hiện diện của __________ trên màng tế bào hồng cầu.", a: "kháng nguyên" },
+  { q: "Trên bề mặt hồng cầu người có ít nhất __________ kháng nguyên phổ biến và hàng trăm kháng nguyên hiếm khác.", a: "30" },
+  { q: "Hai hệ kháng nguyên chính gây phản ứng trong truyền máu là hệ __________ và hệ __________. ", a: "ABO – Rhesus" },
+  { q: "Nhóm máu được định nghĩa là sự hiện diện của __________ trên màng hồng cầu.", a: "kháng nguyên" },
+  { q: "Bản chất của các kháng nguyên trên màng hồng cầu là những __________. ", a: "glycoprotein" },
+  { q: "Trong hệ nhóm máu ABO, màng hồng cầu người có hai loại kháng nguyên là __________ và __________. ", a: "A – B" },
+  { q: "Khi kháng nguyên và kháng thể tương ứng gặp nhau sẽ xảy ra hiện tượng __________. ", a: "ngưng kết" },
+  { q: "Kháng nguyên A sẽ ngưng kết khi gặp kháng thể __________. ", a: "α (anti A)" },
+  { q: "Kháng nguyên B sẽ ngưng kết khi gặp kháng thể __________. ", a: "β (anti B)" },
+  { q: "Kháng thể tồn tại trong __________ và được chia thành hai loại là kháng thể tự nhiên và kháng thể miễn dịch.", a: "huyết thanh" },
+  { q: "Kháng thể của hệ nhóm máu ABO thuộc loại kháng thể __________. ", a: "tự nhiên" },
+  { q: "Kháng thể của hệ nhóm máu Rhesus thuộc loại kháng thể __________. ", a: "miễn dịch" },
+  { q: "Dựa vào sự có mặt của kháng nguyên và kháng thể, Landsteiner phân loại máu hệ ABO thành __________ nhóm.", a: "4" },
+  { q: "Bốn nhóm máu của hệ ABO gồm __________, __________, __________ và __________. ", a: "A – B – AB – O" },
+  { q: "Nhóm máu A có kháng nguyên __________ và kháng thể __________ trong huyết thanh.", a: "A – anti B (β)" },
+  { q: "Nhóm máu B có kháng nguyên __________ và kháng thể __________. ", a: "B – anti A (α)" },
+  { q: "Nhóm máu AB có kháng nguyên __________ và __________, đồng thời __________ kháng thể.", a: "A – B – không có" },
+  { q: "Nhóm máu O __________ kháng nguyên nhưng có kháng thể __________. ", a: "không có – anti A và anti B (α và β)" },
+  { q: "Có hai phương pháp xác định nhóm máu là phương pháp __________ và phương pháp __________. ", a: "trực tiếp – gián tiếp" },
+  { q: "Phương pháp trực tiếp (xuôi) dùng __________ mẫu để tìm kháng nguyên trên màng hồng cầu.", a: "huyết thanh" },
+  { q: "Phương pháp gián tiếp (ngược) dùng __________ mẫu để tìm kháng thể trong huyết thanh.", a: "hồng cầu" },
+  { q: "Nguyên tắc của phương pháp trực tiếp là trộn máu người thử với từng giọt __________ mẫu đã biết trước kháng thể.", a: "huyết thanh" },
+  { q: "Nguyên tắc của phương pháp gián tiếp là trộn huyết thanh người thử với từng giọt __________ mẫu.", a: "hồng cầu" },
+  { q: "Dụng cụ lấy máu trong xác định nhóm máu gồm lancet, bông và __________. ", a: "cồn 70°" },
+  { q: "Huyết thanh mẫu dùng trong phương pháp trực tiếp gồm __________, __________ và __________. ", a: "anti A – anti B – anti AB" },
+  { q: "Khi xác định nhóm máu theo phương pháp trực tiếp, nhỏ __________ giọt huyết thanh mẫu lên lame.", a: "3" },
+  { q: "Máu dùng để thử nhóm máu được lấy từ __________. ", a: "máu mao mạch" },
+  { q: "Vị trí lấy máu thường là cạnh bên đầu ngón tay số __________ hoặc __________ của bàn tay không thuận.", a: "3 – 4" },
+  { q: "Trước khi lấy máu phải sát trùng bằng __________. ", a: "cồn 70°" },
+  { q: "Mỗi giọt máu nhỏ lên lame có đường kính khoảng __________ mm.", a: "3" },
+  { q: "Khi trộn máu với huyết thanh mẫu phải dùng __________ và không dùng chung một đũa cho các giọt khác nhau.", a: "đũa thủy tinh" },
+  { q: "Nếu có hiện tượng ngưng kết sẽ thấy hồng cầu ngưng kết thành __________ trên nền huyết thanh.", a: "những đám" },
+  { q: "Nếu không có hiện tượng ngưng kết, hồng cầu sẽ __________ với huyết thanh mẫu.", a: "hòa lẫn" },
+  { q: "Khi hai giọt anti A và anti AB ngưng kết còn anti B không ngưng kết, kết luận máu thuộc nhóm __________. ", a: "A" },
+  { q: "Khi anti B và anti AB ngưng kết còn anti A không ngưng kết, kết luận máu thuộc nhóm __________. ", a: "B" },
+  { q: "Khi cả ba giọt anti đều ngưng kết, kết luận máu thuộc nhóm __________. ", a: "AB" },
+  { q: "Khi cả ba giọt anti đều không ngưng kết, kết luận máu thuộc nhóm __________. ", a: "O" },
+  { q: "Ứng dụng quan trọng nhất của xác định nhóm máu là trước khi __________. ", a: "truyền máu" },
+  { q: "Xác định nhóm máu còn được ứng dụng trong lĩnh vực __________. ", a: "y pháp" },
+  { q: "Năm __________, Landsteiner phát hiện một loại kháng nguyên trên hồng cầu khỉ Macacus Rhesus.", a: "1904" },
+  { q: "Kháng nguyên được Landsteiner phát hiện trên hồng cầu khỉ Macacus Rhesus được gọi là yếu tố __________. ", a: "Rh" },
+  { q: "Người có hồng cầu chứa yếu tố Rh được quy ước là Rh __________. ", a: "(+)" },
+  { q: "Người không có yếu tố Rh trên hồng cầu được quy ước là Rh __________. ", a: "(−)" },
+  { q: "Hệ thống Rh gồm __________ kháng nguyên, trong đó yếu tố __________ là mạnh nhất.", a: "13 – D" },
+  { q: "Yếu tố D có ý nghĩa __________ trong truyền máu.", a: "quan trọng" },
+  { q: "Ở Việt Nam, đa số dân số thuộc nhóm máu __________. ", a: "Rh (+)" },
+  { q: "Ở người Âu – Mỹ, tỷ lệ Rh (+) chiếm khoảng __________%.", a: "85" },
+  { q: "Kháng thể hệ Rh __________ có sẵn trong máu mà chỉ xuất hiện khi có sự tiếp xúc với kháng nguyên.", a: "không" },
+  { q: "Vì không có sẵn trong máu, kháng thể hệ Rh được gọi là kháng thể __________. ", a: "miễn dịch" },
+  { q: "Trong các kháng thể hệ Rh, kháng thể quan trọng nhất là __________. ", a: "anti D" },
+  { q: "Các kháng thể Rh khác ngoài anti D có mức độ gây phản ứng __________. ", a: "thấp" },
+  { q: "Anti D thuộc lớp globulin miễn dịch __________. ", a: "IgG" },
+  { q: "Kháng thể kháng Rh (anti D) chỉ xuất hiện khi người Rh (−) tiếp xúc với kháng nguyên __________. ", a: "D" },
+  { q: "Trường hợp thứ nhất làm xuất hiện anti D là người Rh (−) được __________ máu Rh (+).", a: "truyền" },
+  { q: "Trường hợp thứ hai làm xuất hiện anti D là mẹ Rh (−) mang thai con Rh __________. ", a: "(+)" },
+  { q: "Định nhóm máu Rh của một người là phát hiện sự có mặt của kháng nguyên __________ trên màng hồng cầu.", a: "D" },
+  { q: "Nguyên tắc xác định nhóm máu Rh là trộn máu người thử với huyết thanh mẫu chứa __________. ", a: "kháng thể kháng Rh (anti D)" },
+  { q: "Dựa vào hiện tượng ngưng kết khi trộn với anti D có thể suy ra __________ của người cần thử.", a: "nhóm máu Rh" },
+  { q: "Dụng cụ lấy máu trong xác định nhóm máu Rh gồm lancet, bông và __________. ", a: "cồn 70°" },
+  { q: "Huyết thanh mẫu dùng để xác định nhóm máu Rh là __________. ", a: "anti D" },
+  { q: "Khi xác định nhóm máu Rh, trên lame chỉ nhỏ __________ giọt huyết thanh mẫu.", a: "1" },
+  { q: "Máu dùng trong xác định nhóm máu Rh là __________. ", a: "máu mao mạch" },
+  { q: "Vị trí sát trùng khi lấy máu là cạnh bên đầu ngón tay số __________ hoặc __________ của bàn tay không thuận.", a: "3 – 4" },
+  { q: "Với trẻ nhỏ, vị trí lấy máu có thể là __________ hoặc __________. ", a: "ngón chân cái – gót chân" },
+  { q: "Giọt máu nhỏ lên lame trong xác định Rh có đường kính khoảng __________ mm.", a: "3" },
+  { q: "Khi trộn máu với huyết thanh anti D phải dùng __________ để trộn.", a: "đũa thủy tinh" },
+  { q: "Sau khi trộn máu với anti D, cần đợi khoảng __________ phút trước khi đọc kết quả.", a: "2" },
+  { q: "Nếu có ngưng kết trong phản ứng Rh, hồng cầu sẽ ngưng kết thành __________ trên nền huyết thanh.", a: "từng đám" },
+  { q: "Nếu không có hiện tượng ngưng kết, hồng cầu sẽ __________ với huyết thanh mẫu.", a: "hòa lẫn" },
+  { q: "Phản ứng ngưng kết của hệ Rh xảy ra __________ hơn so với hệ ABO.", a: "chậm" },
+  { q: "Sau khi trộn máu trong phản ứng Rh, cần cầm lam __________ để quan sát kết quả.", a: "lắc nhẹ" },
+  { q: "Nếu hồng cầu từ từ vón lại và xuất hiện ngưng kết thì kết luận máu thuộc nhóm __________. ", a: "Rh (+)" },
+  { q: "Nếu không xuất hiện hiện tượng ngưng kết khi trộn với anti D thì kết luận máu thuộc nhóm __________. ", a: "Rh (−)" },
+  { q: "Thời gian máu chảy là thời gian từ khi __________ bị tổn thương đến khi __________. ", a: "thành mạch – máu ngừng chảy" },
+  { q: "Thời gian máu chảy chịu ảnh hưởng của yếu tố __________ và __________. ", a: "thành mạch – tiểu cầu" },
+  { q: "Định thời gian máu chảy nhằm xác định tình trạng __________ và __________. ", a: "thành mạch – tiểu cầu" },
+  { q: "Xét nghiệm thời gian máu chảy thường được sử dụng trước khi __________. ", a: "phẫu thuật" },
+  { q: "Định thời gian máu chảy còn được dùng để góp phần chẩn đoán các bệnh lý __________. ", a: "rối loạn đông – cầm máu" },
+  { q: "Phương pháp thường dùng để định thời gian máu chảy do dễ thực hiện là phương pháp __________. ", a: "Duke" },
+  { q: "Nguyên lý của phương pháp Duke là đo thời gian từ lúc tạo vết thương mạch máu đến khi __________. ", a: "cầm máu" },
+  { q: "Vị trí tạo vết thương trong phương pháp Duke là vùng __________. ", a: "giữa dái tai" },
+  { q: "Dụng cụ tạo vết thương trong phương pháp Duke là __________. ", a: "kim chích (Blood lancet)" },
+  { q: "Các phương tiện cần có trong phương pháp Duke gồm kim chích, __________, giấy thấm và bông thấm.", a: "đồng hồ bấm giây" },
+  { q: "Trước khi chích, cần sát trùng vùng dái tai bằng __________. ", a: "cồn" },
+  { q: "Sau khi sát trùng, cần chờ khoảng __________ phút cho cồn bay hơi.", a: "1 – 2" },
+  { q: "Vết thương tạo ra trong phương pháp Duke có chiều dài __________ mm và chiều sâu __________ mm.", a: "2 – 2" },
+  { q: "Sau khi chích tạo vết thương, cần __________ để bắt đầu tính thời gian.", a: "khởi động đồng hồ bấm giây" },
+  { q: "Trong quá trình đo, cứ __________ giây một lần dùng giấy thấm thấm giọt máu.", a: "30" },
+  { q: "Khi thấm máu phải tránh thấm __________ da.", a: "sát" },
+  { q: "Mỗi lần thấm máu cần thấm ở __________ khác nhau.", a: "vị trí" },
+  { q: "Khi máu ngừng chảy, bấm đồng hồ dừng lại, đếm số giọt máu trên giấy thấm rồi __________. ", a: "chia đôi" },
+  { q: "Kết quả phép chia số giọt máu chính là thời gian máu chảy tính bằng __________. ", a: "phút" },
+  { q: "Thời gian máu chảy bình thường theo phương pháp Duke là __________ phút.", a: "2 – 3" },
+  { q: "Thời gian máu chảy trên __________ phút được coi là kéo dài.", a: "6" },
+  { q: "Nếu sau __________ phút tạo vết chích mà không thấy máu chảy thì tiến hành lại ở tai đối diện.", a: "2" },
+  { q: "Nếu cả hai tai đều không chảy máu sau 2 phút thì kết luận thời gian máu chảy __________. ", a: "bình thường" },
+  { q: "Một nguyên nhân sai lầm trong phương pháp Duke là kích thước vết chích __________ tiêu chuẩn.", a: "không đạt" },
+  { q: "Vết chích quá nông hoặc quá sâu đều có thể gây __________ kết quả.", a: "sai" },
+  { q: "Thấm máu quá mạnh có thể làm bong __________ mới hình thành.", a: "nút tiểu cầu" },
+  { q: "Bất thường __________ vùng dái tai cũng là nguyên nhân gây sai kết quả.", a: "mạch máu" },
+  { q: "Thời gian máu đông là thời gian từ khi thành mạch bị tổn thương đến khi máu __________. ", a: "đông lại thành cục" },
+  { q: "Xét nghiệm thời gian máu đông thường được dùng trước khi __________. ", a: "phẫu thuật" },
+  { q: "Phương pháp thường dùng để định thời gian máu đông do dễ thực hiện là phương pháp __________. ", a: "Milian" },
+  { q: "Nguyên lý của phương pháp Milian là đo thời gian từ khi tạo vết thương mạch máu đến khi __________. ", a: "máu đông lại" },
+  { q: "Vị trí tạo vết thương trong phương pháp Milian là đầu ngón tay __________ hoặc __________. ", a: "III – IV" },
+  { q: "Máu được lấy trong phương pháp Milian là __________. ", a: "máu mao mạch" },
+  { q: "Khi lấy máu, giọt đầu tiên sẽ __________, lấy từ giọt thứ __________. ", a: "bỏ – 2" },
+  { q: "Mỗi giọt máu nhỏ lên lam kính có đường kính khoảng __________ cm.", a: "0,7 – 1" },
+  { q: "Số lam kính dùng trong phương pháp Milian là __________. ", a: "2" },
+  { q: "Lam kính thứ hai được đậy nắp hộp Petri nhằm tránh __________ nước.", a: "bốc hơi" },
+  { q: "Sau __________ phút kể từ lúc chích máu, bắt đầu nghiêng lam kính để quan sát sự đông máu.", a: "2" },
+  { q: "Cứ __________ giây nghiêng lam kính một lần để quan sát.", a: "30" },
+  { q: "Khi giọt máu không thay đổi hình dạng thì chứng tỏ máu đã __________. ", a: "đông" },
+  { q: "Khi giọt máu ở lam kính thứ hai đông chắc thì __________ và ghi kết quả.", a: "bấm đồng hồ dừng lại" },
+  { q: "Thời gian máu đông bình thường theo phương pháp Milian là __________ phút.", a: "8 – 10" },
+  { q: "Thời gian máu đông trên __________ phút được coi là kéo dài.", a: "15" },
+  { q: "Kết quả của phương pháp Milian còn phụ thuộc vào __________ môi trường.", a: "nhiệt độ" },
+  { q: "Do phụ thuộc nhiệt độ môi trường nên kết quả định thời gian máu đông có thể __________. ", a: "thay đổi" },
+  { q: "Định công thức bạch cầu thường là xác định __________ giữa các loại bạch cầu máu.", a: "tỷ lệ phần trăm" },
+  { q: "Sự thay đổi __________ của từng loại bạch cầu giúp định hướng và chẩn đoán một số __________. ", a: "tỉ lệ % – bệnh" },
+  { q: "Định công thức bạch cầu thường là một trong những xét nghiệm __________ trong lâm sàng.", a: "cơ bản" },
+  { q: "Trong 1 lít máu ngoại vi, số lượng bạch cầu trung bình ở người trưởng thành dao động từ __________ đến __________. ", a: "5,0 × 10⁹ – 9,0 × 10⁹" },
+  { q: "Số lượng bạch cầu trong 1 lít máu ngoại vi ở nam giới là khoảng __________. ", a: "7,0 × 10⁹" },
+  { q: "Số lượng bạch cầu trong 1 lít máu ngoại vi ở nữ giới là khoảng __________. ", a: "6,2 × 10⁹" },
+  { q: "Trẻ sơ sinh có số lượng bạch cầu rất cao, khoảng __________ bạch cầu trong 1 lít máu ngoại vi.", a: "20,0 × 10⁹" },
+  { q: "Đến 1 tuổi, số lượng bạch cầu giảm còn khoảng __________ bạch cầu trong 1 lít máu ngoại vi.", a: "10,0 × 10⁹" },
+  { q: "Từ __________ tuổi trở đi, số lượng bạch cầu ổn định như người trưởng thành.", a: "12" },
+  { q: "Bạch cầu được chia thành hai nhóm chính là bạch cầu __________ và bạch cầu __________. ", a: "hạt – không hạt" },
+  { q: "Bạch cầu hạt còn được gọi là bạch cầu __________. ", a: "đa nhân" },
+  { q: "Bạch cầu không hạt còn được gọi là bạch cầu __________. ", a: "đơn nhân" },
+  { q: "Bạch cầu đa nhân gồm 3 loại là __________, __________ và __________. ", a: "trung tính – ưa acid – ưa base" },
+  { q: "Bạch cầu đơn nhân gồm 2 loại là __________ và __________. ", a: "monocyt – lymphocyte" },
+  { q: "Công thức bạch cầu được xác định bằng cách __________ máu trên phiến kính, __________ Giemsa và soi dưới __________. ", a: "dàn mỏng – nhuộm – kính hiển vi" },
+  { q: "Việc nhận dạng bạch cầu dựa vào hình dạng, __________, hình dạng __________ và cách bắt màu của __________. ", a: "kích thước – nhân – nhân và bào tương" },
+  { q: "Đếm tổng cộng __________ bạch cầu để tính tỉ lệ các loại bạch cầu.", a: "100" },
+  { q: "Kính hiển vi dùng trong xét nghiệm gồm thị kính __________ và các vật kính __________, __________ và __________. ", a: "10 – 10 – 40 – 100" },
+  { q: "Thuốc nhuộm sử dụng trong xét nghiệm là __________. ", a: "Giemsa" },
+  { q: "Dung môi dùng pha thuốc nhuộm là __________. ", a: "nước cất trung tính" },
+  { q: "Ngón tay thường dùng để lấy máu mao mạch là ngón __________ hoặc __________ của tay __________. ", a: "III – IV – không thuận" },
+  { q: "Độ sâu vết chích máu khoảng __________ mm.", a: "1" },
+  { q: "Giọt máu đầu tiên sau khi chích phải __________. ", a: "bỏ đi" },
+  { q: "Giọt máu dùng làm tiêu bản có đường kính khoảng __________ mm.", a: "3" },
+  { q: "Lam kéo được đặt với góc khoảng __________ so với lam kính.", a: "30–45°" },
+  { q: "Sau khi kéo, tiêu bản đạt yêu cầu phải mỏng, đều, không gợn sóng và có __________. ", a: "đuôi" },
+  { q: "Tiêu bản được cố định bằng __________. ", a: "cồn tuyệt đối 90°" },
+  { q: "Tỷ lệ pha loãng thuốc nhuộm Giemsa mẹ với nước cất trung tính là __________ hoặc __________. ", a: "1/6 – 1/7" },
+  { q: "Thời gian nhuộm tiêu bản là khoảng __________ phút.", a: "15–20" },
+  { q: "Sau nhuộm, tiêu bản được rửa dưới vòi nước __________ và để khô __________. ", a: "chảy nhẹ – tự nhiên" },
+  { q: "Quan sát ban đầu dùng vật kính __________, sau đó chuyển sang vật kính __________. ", a: "10 – 40" },
+  { q: "Khi quan sát chi tiết, nhỏ __________ và dùng vật kính __________. ", a: "dầu Cèdre – 100" },
+  { q: "BC đa nhân trung tính có nhân chia từ __________ đến __________ múi.", a: "2 – 5" },
+  { q: "Bạch cầu trung tính càng già thì nhân càng __________. ", a: "nhiều múi" },
+  { q: "Bào tương của BC trung tính có hạt đặc hiệu nhỏ, đều, bắt màu __________. ", a: "hồng" },
+  { q: "BC ưa acid có nhân thường chia __________ múi, nối nhau như __________. ", a: "2 – mắt kính" },
+  { q: "Hạt đặc hiệu của BC ưa acid bắt màu __________. ", a: "da cam" },
+  { q: "BC ưa base có nhân chia nhiều múi dính nhau như hình __________. ", a: "hoa thị" },
+  { q: "Hạt của BC ưa base bắt màu __________. ", a: "xanh đen" },
+  { q: "BC lympho có nhân __________, __________, bắt màu kiềm sẫm chiếm gần hết tế bào.", a: "to – tròn" },
+  { q: "BC mono có kích thước __________, nhân hình __________, bắt màu __________ yếu.", a: "rất lớn – hạt đậu – acid" },
+  { q: "Vùng dùng để đếm công thức bạch cầu là vùng __________ của tiêu bản.", a: "đuôi" },
+  { q: "Cách đếm bạch cầu thường theo hình __________. ", a: "zic-zắc" },
+  { q: "Công thức bạch cầu được tính sau khi đếm đủ __________ bạch cầu.", a: "100" },
+  { q: "BC đa nhân trung tính chiếm __________ đến __________ %.", a: "50 – 70" },
+  { q: "BC lympho chiếm __________ đến __________ %.", a: "20 – 40" },
+  { q: "BC ưa acid chiếm khoảng __________ đến __________ %.", a: "1 – 3" },
+  { q: "BC ưa base chiếm khoảng __________ đến __________ %.", a: "0 – 1" },
+  { q: "BC mono chiếm __________ đến __________ %.", a: "5 – 10" },
+  // Phần NHÓM MÁU HỆ ABO và các phần sau...
+  { q: "Dựa vào sự có mặt của các __________ trên màng hồng cầu, Landsteiner phân loại máu thành 4 nhóm.", a: "kháng nguyên" },
+  { q: "Bốn nhóm máu hệ ABO gồm __________, __________, __________ và __________. ", a: "A – B – AB – O" },
+  { q: "Nhóm máu A có kháng nguyên __________ trên màng hồng cầu.", a: "A" },
+  { q: "Nhóm máu A có kháng thể __________ trong huyết tương.", a: "anti B (β)" },
+  { q: "Genotype của nhóm máu A là __________ hoặc __________. ", a: "OA – AA" },
+  { q: "Nhóm máu B có kháng nguyên __________ trên màng hồng cầu.", a: "B" },
+  { q: "Nhóm máu B có kháng thể __________ trong huyết tương.", a: "anti A (α)" },
+  { q: "Genotype của nhóm máu B là __________ hoặc __________. ", a: "OB – BB" },
+  { q: "Nhóm máu AB có kháng nguyên __________ trên màng hồng cầu.", a: "A và B" },
+  { q: "Nhóm máu AB __________ kháng thể trong huyết tương.", a: "không có" },
+  { q: "Genotype của nhóm máu AB là __________. ", a: "AB" },
+  { q: "Nhóm máu O __________ kháng nguyên trên màng hồng cầu.", a: "không có" },
+  { q: "Nhóm máu O có kháng thể __________ trong huyết tương.", a: "anti AB (α và β)" },
+  { q: "Genotype của nhóm máu O là __________. ", a: "OO" },
+  { q: "Nghiệm pháp hồng cầu còn gọi là nghiệm pháp __________. ", a: "trực tiếp" },
+  { q: "Nghiệm pháp hồng cầu nhằm xác định __________ ABO trên __________. ", a: "kháng nguyên – hồng cầu" },
+  { q: "Tên khác của nghiệm pháp hồng cầu là nghiệm pháp __________. ", a: "Beth – Vincent" },
+  { q: "Nghiệm pháp này sử dụng __________ đã chuẩn hóa chứa kháng thể __________, __________ và __________. ", a: "kháng huyết thanh – anti A – anti B – anti AB" },
+  { q: "Dựa vào phản ứng __________ với hồng cầu để định nhóm máu.", a: "ngưng kết" },
+  { q: "Nghiệm pháp huyết thanh còn gọi là nghiệm pháp __________. ", a: "gián tiếp" },
+  { q: "Nghiệm pháp này sử dụng __________ chứa kháng nguyên đã biết.", a: "hồng cầu" },
+  { q: "Huyết thanh dùng trong nghiệm pháp này là huyết thanh của __________. ", a: "người cần định nhóm máu" },
+  { q: "Nghiệm pháp huyết thanh nhằm xác định sự có mặt của kháng thể __________ và __________ trong huyết thanh.", a: "anti A – anti B" },
+  { q: "Từ kết quả nghiệm pháp huyết thanh có thể suy ra __________ của người thử.", a: "nhóm máu" },
+  { q: "Trong bảng so sánh, ký hiệu (+) nghĩa là __________. ", a: "ngưng kết" },
+  { q: "Ký hiệu (–) nghĩa là __________. ", a: "không ngưng kết" },
+  { q: "Nhóm máu O không ngưng kết với __________, __________ và __________. ", a: "anti A – anti B – anti AB" },
+  { q: "Nhóm máu AB ngưng kết với __________, __________ và __________. ", a: "anti A – anti B – anti AB" },
+  { q: "Khi định nhóm máu ABO cần tiến hành đồng thời __________ nghiệm pháp.", a: "2" },
+  { q: "Kết quả của hai nghiệm pháp phải __________ nhau.", a: "khớp" },
+  { q: "Nếu kết quả không khớp phải dùng __________ cao hơn để xác định.", a: "kỹ thuật" },
+  { q: "Huyết thanh mẫu phải đủ __________, __________ và __________. ", a: "anti A – anti B – anti AB" },
+  { q: "Huyết cầu mẫu phải đủ hồng cầu __________, __________ và __________. ", a: "A – B – O" },
+  { q: "Huyết thanh mẫu phải đạt đủ __________, __________ và __________. ", a: "độ nhạy – độ mạnh – hiệu giá" },
+  { q: "Hồng cầu mẫu phải là hồng cầu __________ đã rửa sạch __________ lần bằng __________. ", a: "mới – 3 – nước muối 9/1000 NaCl" },
+  { q: "Hồng cầu sau khi rửa được pha thành huyền dịch __________ đến __________. ", a: "5/100 – 10/100" },
+  { q: "Truyền máu được chỉ định khi __________ thể tích máu.", a: "giảm" },
+  { q: "Truyền máu được dùng để điều trị __________. ", a: "thiếu máu" },
+  { q: "Truyền huyết tương cho bệnh nhân thiếu __________. ", a: "các yếu tố đông máu" },
+  { q: "Nguyên tắc chung của truyền máu là không để __________ và __________ tương ứng gặp nhau trong máu người nhận.", a: "kháng nguyên – kháng thể" },
+  { q: "Người có nhóm máu nào thì nên truyền __________ nhóm máu đó.", a: "đúng" },
+  { q: "Khi truyền khác nhóm, kháng nguyên trên hồng cầu người cho không bị __________ bởi kháng thể tương ứng trong huyết tương người nhận.", a: "ngưng kết" },
+  { q: "Nhóm máu O không có __________ trên màng hồng cầu.", a: "kháng nguyên" },
+  { q: "Nhóm máu O được gọi là __________. ", a: "nhóm máu chuyên cho" },
+  { q: "Nhóm máu AB không có __________ trong huyết tương.", a: "kháng thể" },
+  { q: "Nhóm máu AB được gọi là __________. ", a: "nhóm máu chuyên nhận" },
+  { q: "Trong thực tế, kháng thể trong huyết tương người cho __________ gây ngưng kết hồng cầu người nhận.", a: "không" },
+  { q: "Lý do là vì kháng thể được truyền vào với lượng __________ và bị __________ trong máu người nhận.", a: "rất nhỏ – pha loãng" },
+  { q: "Ngoài ra, kháng thể còn bị __________ bởi kháng nguyên trong tế bào và các __________ của cơ thể.", a: "trung hòa – dịch" },
+  { q: "Máu là loại __________ bao gồm các tế bào lơ lửng trong khoảng gian bào là __________. ", a: "mô liên kết – dịch lỏng" },
+  { q: "Máu có chức năng __________ các chất giữa các tế bào trong cơ thể và môi trường __________. ", a: "vận chuyển – bên ngoài" },
+  { q: "Máu tham gia __________ cơ thể và __________ hoạt động của các cơ quan.", a: "bảo vệ – điều hòa" },
+  { q: "Máu có vai trò __________ thân nhiệt, __________ nước và __________ khoáng.", a: "điều hòa – cân bằng – muối" },
+  { q: "Máu còn tham gia duy trì ổn định __________ thẩm thấu và độ __________ của dịch thể.", a: "áp suất – pH" },
+  { q: "Cùng với __________ và các __________ khác, máu tạo thành môi trường bên trong (__________ ).", a: "bạch huyết – dịch thể – nội môi" },
+  { q: "Môi trường bên trong luôn có chỉ tiêu __________ – __________ ổn định.", a: "sinh lý – sinh hóa" },
+  { q: "Khi để máu lắng hoặc ly tâm, máu phân thành __________ lớp.", a: "2" },
+  { q: "Lớp trên là __________ chiếm __________ % thể tích.", a: "huyết tương – 55" },
+  { q: "Lớp dưới là __________ chiếm __________ % thể tích.", a: "tế bào máu – 45" },
+  { q: "Trong các tế bào máu, __________ chiếm trên __________ % tổng số.", a: "hồng cầu – 99" },
+  { q: "Phần còn lại là __________ và __________. ", a: "bạch cầu – tiểu cầu" },
+  { q: "Số lượng tế bào máu ở người bình thường __________ rất ít trong điều kiện __________. ", a: "thay đổi – bình thường" },
+  { q: "Sự thay đổi số lượng hồng cầu là dấu hiệu phản ánh __________ __________ của cơ thể.", a: "trạng thái sinh lý" },
+  { q: "Do số lượng hồng cầu rất __________ nên phải __________ trước khi đếm.", a: "nhiều – pha loãng" },
+  { q: "Sau khi đếm trong thể tích __________, từ đó tính số lượng trên thể tích __________. ", a: "nhỏ – lớn" },
+  { q: "Buồng đếm Neubauer là một miếng __________ dày hình __________. ", a: "kính – chữ nhật" },
+  { q: "Buồng đếm có __________ khu vực có kẻ ô đếm.", a: "2" },
+  { q: "Ô chính giữa dùng để đếm __________, các ô 4 góc dùng để đếm __________. ", a: "hồng cầu – bạch cầu" },
+  { q: "Buồng đếm được chia thành __________ ô vuông lớn, mỗi ô có diện tích __________ mm².", a: "9 – 1" },
+  { q: "Ô chính giữa được chia thành __________ ô trung bình.", a: "25" },
+  { q: "Mỗi ô trung bình lại chia thành __________ ô nhỏ.", a: "16" },
+  { q: "Tổng cộng ô đếm hồng cầu có __________ ô nhỏ.", a: "400" },
+  { q: "Diện tích mỗi ô nhỏ là __________ mm².", a: "1/400" },
+  { q: "Ô đếm bạch cầu chỉ chia đến ô __________, không chia ô __________. ", a: "trung bình – nhỏ" },
+  { q: "Ống trộn hồng cầu có dạng giống __________. ", a: "pipette" },
+  { q: "Trong bầu ống trộn có __________ hoặc __________ màu đỏ.", a: "hạt nhựa vuông – hạt thủy tinh" },
+  { q: "Ống trộn có các vạch __________ – __________ – __________. ", a: "0,5 – 1 – 101" },
+  { q: "Thể tích từ đầu ống đến vạch 101 gấp __________ lần đoạn đến vạch 0,5.", a: "200" },
+  { q: "Thể tích từ đầu ống đến vạch 101 gấp __________ lần đoạn đến vạch 1.", a: "100" },
+  { q: "Dung dịch pha loãng hồng cầu phải là dung dịch __________ trương.", a: "đẳng" },
+  { q: "Dung dịch Hayem chứa NaCl __________ g, Na₂SO₄ __________ g, HgCl₂ __________ g.", a: "1 – 5 – 0,5" },
+  { q: "Dung dịch Ringer trong 100 ml có NaCl __________ mg.", a: "860" },
+  { q: "Dung dịch NaCl sinh lý có nồng độ __________ g/__________ ml.", a: "9 – 1000" },
+  { q: "Máu được lấy vào buổi __________ khi thú __________ ăn và __________ vận động.", a: "sáng – chưa – ít" },
+  { q: "Vị trí lấy máu là __________ ngón __________. ", a: "tĩnh mạch – IV" },
+  { q: "Chất kháng đông thường dùng là __________ __________ nồng độ __________ %. ", a: "Natri citrate – 5" },
+  { q: "Khi hút máu phải bỏ __________ máu đầu và hút __________ máu.", a: "giọt – giọt thứ nhì" },
+  { q: "Máu phải chảy __________, không được __________. ", a: "tự nhiên – nặn" },
+  { q: "Hút máu đến vạch __________. ", a: "0,5" },
+  { q: "Hút dung dịch pha loãng đến vạch __________. ", a: "101" },
+  { q: "Độ pha loãng hồng cầu khi hút đến vạch 0,5 là __________ lần.", a: "200" },
+  { q: "Nếu hút máu đến vạch 1 thì độ pha loãng là __________ lần.", a: "100" },
+  { q: "Trộn máu bằng cách lắc ống theo hình số __________ ít nhất __________ phút.", a: "8 – 1" },
+  { q: "Đếm hồng cầu ở __________ ô trung bình.", a: "5" },
+  { q: "Trong mỗi ô trung bình đếm __________ ô nhỏ.", a: "16" },
+  { q: "Tổng số ô nhỏ được đếm là __________ ô.", a: "80" },
+  { q: "Đếm các hồng cầu nằm gọn trong ô và nằm ở cạnh __________ và cạnh __________. ", a: "trên – trái" },
+  { q: "Hồng cầu nằm trên vạch ngoài thì __________ tính __________. ", a: "2 – 1" },
+  { q: "Mỗi mẫu máu nên được đếm __________ lần để kiểm chứng.", a: "2" },
+  { q: "Gọi A là __________ hồng cầu đếm được trong __________ ô nhỏ.", a: "tổng số – 80" },
+  { q: "Số hồng cầu trong 1 mm³ máu bằng __________ × __________. ", a: "A – 10.000" },
+  { q: "Số 4000 được tính từ __________ × __________. ", a: "400 – 10" },
+  { q: "Độ pha loãng mẫu máu là __________. ", a: "200" },
+  { q: "Ống trộn được rửa bằng __________ nồng độ __________ N.", a: "HCl – 0,1" },
+  { q: "Buồng đếm được rửa bằng __________ và lau bằng __________. ", a: "nước cất – bông gòn" },
+  { q: "Sau khi rửa, buồng đếm và ống trộn phải được __________ hoặc __________ khô.", a: "sấy – lau" },
+  // Phần BẠCH CẦU
+  { q: "Đếm số lượng __________ của máu toàn phần trong một __________ đã biết.", a: "bạch cầu – thể tích" },
+  { q: "Máu được pha loãng với một __________ pha loãng nhất định để tính số lượng bạch cầu trong một __________ máu toàn phần.", a: "tỷ lệ – lít" },
+  { q: "Máu dùng để xét nghiệm là máu __________ hoặc __________ chưa kịp đông.", a: "tĩnh mạch – mao mạch" },
+  { q: "Máu có thể được chống đông bằng __________ khô với nồng độ __________ mg/ml.", a: "EDTA – 1,5" },
+  { q: "Dụng cụ lấy máu gồm dụng cụ lấy máu __________ và __________. ", a: "mao mạch – tĩnh mạch" },
+  { q: "Dung dịch đếm bạch cầu có thể dùng dung dịch __________, __________ hoặc __________. ", a: "Lazarus – Hayem – xanh acetic" },
+  { q: "Ống pha loãng bạch cầu (potain) dùng loại pha loãng __________ lần.", a: "20" },
+  { q: "Dụng cụ quan sát là __________ hiển vi __________. ", a: "kính – quang học" },
+  { q: "Trước khi hút máu cần __________ kỹ ống máu.", a: "lắc" },
+  { q: "Khi chích đầu ngón tay cần __________ bỏ __________ đầu.", a: "thấm – giọt" },
+  { q: "Hút máu đến vạch __________ trên potain.", a: "0,5" },
+  { q: "Sau đó hút dung dịch pha loãng bạch cầu đến vạch __________. ", a: "11" },
+  { q: "Độ pha loãng đạt được là __________. ", a: "1/20" },
+  { q: "Lắc potain theo chiều __________ khoảng __________ phút.", a: "dọc – 2–3" },
+  { q: "Khi hút máu và dung dịch pha loãng cần chú ý không tạo __________. ", a: "bọt" },
+  { q: "Không được hút máu __________ vạch chuẩn và không được để __________ máu.", a: "quá – mất" },
+  { q: "Gắn __________ lên buồng đếm __________ và __________. ", a: "lamen – khô – sạch" },
+  { q: "Sau khi lắc kỹ, cần bỏ __________ đầu.", a: "giọt" },
+  { q: "Nhỏ một giọt __________ đầy buồng đếm nhưng không __________ ra ngoài.", a: "to – tràn" },
+  { q: "Đợi __________ phút trước khi quan sát.", a: "5" },
+  { q: "Dùng vật kính __________ để kiểm tra sự phân bố của bạch cầu.", a: "x10" },
+  { q: "Đếm bạch cầu trong __________ khu vực.", a: "25" },
+  { q: "Mỗi khu vực có __________ ô vuông.", a: "4" },
+  { q: "Gọi n là __________ bạch cầu đếm được.", a: "tổng số" },
+  { q: "Công thức tính số lượng bạch cầu là __________ × __________ × __________ / __________. ", a: "n – 20 – 10 – 4" },
+  { q: "Kết quả được biểu diễn là __________ n / mm³.", a: "50" },
+  { q: "Số 10 trong công thức là __________ buồng đếm.", a: "chiều cao" },
+  { q: "Số 4 là __________ của 25 khu vực đếm.", a: "diện tích (mm²)" },
+  { q: "Đếm bạch cầu trong __________ khu vực.", a: "4" },
+  { q: "Mỗi khu vực có __________ ô vuông.", a: "16" },
+  { q: "Công thức tính số lượng bạch cầu là __________ × __________ × __________ / __________ × __________. ", a: "n – 20 – 10 – 4 – 10⁶" },
+  { q: "Kết quả biểu diễn là __________ n × 10⁶ / lít.", a: "50" },
+  { q: "Đếm bạch cầu trong __________ khu vực, mỗi khu vực có __________ ô vuông.", a: "16 – 16" },
+  { q: "Tổng diện tích là __________ mm².", a: "1" },
+  { q: "Công thức tính số lượng bạch cầu là __________ n × 10⁶ / lít.", a: "200" },
+  { q: "Đếm bạch cầu trong __________ khu vực.", a: "100" },
+  { q: "Mỗi khu vực có __________ ô vuông.", a: "20" },
+  { q: "Tổng diện tích đếm là __________ mm².", a: "1" },
+  { q: "Công thức tính số lượng bạch cầu là __________ n × 10⁶ / lít.", a: "200" },
+  { q: "Máu đông __________ hoặc bị pha loãng bởi __________ gian bào gây sai số.", a: "dây – dịch" },
+  { q: "Dụng cụ __________ hoặc __________ đều gây sai số.", a: "bẩn – ướt" },
+  { q: "Gắn lamen không __________ gây phân bố không đều.", a: "khít" },
+  { q: "Pha loãng không chuẩn do hút máu không đúng __________. ", a: "vạch" },
+  { q: "Dung dịch pha loãng có nhiều __________ hoặc __________. ", a: "cặn – vẩn đục" },
+  { q: "Không __________ đều hoặc nhỏ buồng đếm có __________ khí.", a: "trộn – bọt" },
+  { q: "__________ hoặc __________ kết quả sai cũng gây sai số.", a: "đếm – tính" },
+  // Phần TIỂU CẦU
+  { q: "Đếm số lượng __________ trong một __________ đã biết của máu toàn phần.", a: "tiểu cầu – thể tích" },
+  { q: "Từ đó tính ra số lượng tiểu cầu trong một __________ máu toàn phần.", a: "lít" },
+  { q: "Máu xét nghiệm tốt nhất lấy khi bệnh nhân __________ ăn sáng.", a: "chưa" },
+  { q: "Dung dịch pha loãng tiểu cầu có thể dùng __________ oxalat hoặc __________. ", a: "amoni – Marcano" },
+  { q: "Có thể dùng potain __________ loại 200 lần hoặc potain __________ loại 20 lần.", a: "hồng cầu – bạch cầu" },
+  { q: "Dụng cụ quan sát gồm kính hiển vi __________ hoặc __________. ", a: "đối pha – quang học" },
+  { q: "Hút máu đến vạch __________. ", a: "0,5" },
+  { q: "Hút dung dịch Marcano đến vạch __________. ", a: "101" },
+  { q: "Độ pha loãng đạt được là __________. ", a: "1/200" },
+  { q: "Lắc potain theo chiều dọc khoảng __________ phút.", a: "3–5" },
+  { q: "Trường hợp giảm tiểu cầu, hút máu đến vạch __________ để đạt độ pha loãng __________. ", a: "1 – 1/100" },
+  { q: "Dùng potain __________ hút máu đến vạch __________. ", a: "bạch cầu – 0,5" },
+  { q: "Hút dung dịch amoni oxalat đến vạch __________. ", a: "11" },
+  { q: "Độ pha loãng đạt được là __________. ", a: "1/20" },
+  { q: "Mục đích lắc potain là để hồng cầu __________ hết.", a: "tan" },
+  { q: "Trường hợp giảm tiểu cầu có thể pha loãng __________. ", a: "1/10" },
+  { q: "Đợi __________ phút trước khi đếm.", a: "10" },
+  { q: "Khu vực đếm tiểu cầu chính là khu vực đếm __________. ", a: "hồng cầu" },
+  { q: "Luôn đếm __________ khu vực gồm __________ góc và __________ giữa.", a: "5 – 4 – 1" },
+  { q: "Mỗi khu vực gồm __________ ô vuông nhỏ.", a: "16" },
+  { q: "Thể tích mỗi ô vuông nhỏ là __________ mm³.", a: "1/4000" },
+  { q: "Tiểu cầu có kích thước khoảng __________ hồng cầu.", a: "1/10" },
+  { q: "Gọi n là tổng số tiểu cầu trên __________ khu vực.", a: "5" },
+  { q: "Với độ pha loãng 1/200, công thức tính là N = __________ × 10¹⁰ / lít.", a: "n" },
+  { q: "Với độ pha loãng 1/20, công thức tính là N = __________ × 10⁹ / lít.", a: "n" },
+  { q: "Đếm tiểu cầu dựa vào tỷ lệ __________ / __________ trên tiêu bản nhuộm __________. ", a: "bạch cầu – tiểu cầu – giemsa" },
+  { q: "Phương pháp này có __________ lớn nhưng có vai trò __________. ", a: "sai số – bổ sung" },
+  { q: "Máu mao mạch bị pha loãng do __________ bóp đầu ngón tay.", a: "nặn" },
+  { q: "Dụng cụ __________, __________ gây sai số.", a: "bẩn – ướt" },
+  { q: "Pha loãng không đúng do hút máu không đúng __________. ", a: "vạch" },
+  { q: "Không __________ đều hoặc đếm __________ gây kết quả sai.", a: "trộn – sai" },
+  // Phần XÉT NGHIỆM NƯỚC TIỂU
+  { q: "Nước tiểu được hình thành __________ từ __________. ", a: "liên tục – thận" },
+  { q: "Nước tiểu là sản phẩm dịch lọc của __________. ", a: "huyết tương" },
+  { q: "Đơn vị chức năng chính của thận là các __________. ", a: "nephron" },
+  { q: "Số lượng nephron trong thận khoảng __________ triệu.", a: "1 – 1,5" },
+  { q: "Thận là cơ quan __________ chính của cơ thể.", a: "bài tiết" },
+  { q: "Ngoài thận, cơ thể còn bài tiết qua __________ và __________. ", a: "da – hô hấp" },
+  { q: "Thận có chức năng bài tiết và __________ chọn lọc các chất theo nhu cầu cơ thể.", a: "hấp thu" },
+  { q: "Vai trò của thận là thải các chất __________ từ các sản phẩm __________ trong cơ thể.", a: "không cần thiết – chuyển hóa" },
+  { q: "Thận có vai trò __________ nội môi.", a: "cân bằng" },
+  { q: "Thận còn tham gia điều hòa __________. ", a: "huyết áp" },
+  { q: "Thành phần thường gặp của nước tiểu gồm __________ và các chất __________, __________ hòa tan trong nước.", a: "ure – vô cơ – hữu cơ" },
+  { q: "Thành phần chủ yếu của nước tiểu là các sản phẩm từ thoái hóa __________. ", a: "protein" },
+  { q: "Các sản phẩm thoái hóa protein thường gặp là __________, __________ và __________. ", a: "ure – creatinin – acid uric" },
+  { q: "Một số chất khác có thể gặp trong nước tiểu là __________, __________ và __________. ", a: "hormone – vitamin – thuốc" },
+  { q: "Các phần tử hữu hình có thể thấy trong nước tiểu gồm __________, __________, __________, __________, __________. ", a: "tế bào – trụ tế bào – tinh thể – dịch nhầy – vi khuẩn" },
+  { q: "Các phần tử hữu hình tuy không có nguồn gốc từ __________ nhưng được coi là __________. ", a: "dịch lọc huyết tương – bệnh lý" },
+  { q: "Ở nam giới, cần kéo __________ để lộ __________. ", a: "da quy đầu – lỗ tiểu" },
+  { q: "Lỗ tiểu được rửa bằng __________ và __________. ", a: "nước – xà phòng" },
+  { q: "Sau đó sát trùng bằng __________. ", a: "povidine" },
+  { q: "Bỏ __________ đầu tiên và hứng __________ đang chảy.", a: "nước tiểu – dòng nước tiểu" },
+  { q: "Ở nữ giới, dùng tay tách __________ ra.", a: "hai môi lớn" },
+  { q: "Lau sạch lỗ tiểu theo hướng từ __________ ra __________. ", a: "trước – sau" },
+  { q: "Ở trẻ em, lấy nước tiểu bằng __________ trong __________. ", a: "túi nhựa – vô trùng" },
+  { q: "Phương pháp này được thực hiện bởi __________. ", a: "nhân viên y tế" },
+  { q: "Chỉ dùng khi không lấy được bằng phương pháp __________. ", a: "giữa dòng" },
+  { q: "Áp dụng trong các trường hợp __________ hoặc __________. ", a: "tiểu không tự chủ – bí tiểu" },
+  { q: "Phương pháp này do __________ thực hiện.", a: "bác sĩ" },
+  { q: "Chỉ thực hiện khi có __________. ", a: "cầu bàng quang" },
+  { q: "Vị trí chọc là trên xương mu __________ cm.", a: "2" },
+  { q: "Đường chọc là đường __________ giữa.", a: "trắng" },
+  { q: "Màu nước tiểu bình thường là màu __________ trong.", a: "vàng" },
+  { q: "Màu nước tiểu do sắc tố __________ và __________ tạo nên.", a: "urochrome – urobilin" },
+  { q: "Nước tiểu cô đặc có màu vàng __________. ", a: "sẫm" },
+  { q: "Nước tiểu pha loãng có màu vàng __________. ", a: "nhạt" },
+  { q: "Màu đỏ của nước tiểu gặp trong __________ hoặc do __________. ", a: "tiểu máu – thuốc" },
+  { q: "Màu xá xị gặp trong tiểu __________ hoặc __________. ", a: "hemoglobin – myoglobin" },
+  { q: "Màu vàng đậm gặp trong __________ hoặc do thuốc __________. ", a: "vàng da – tetracycline" },
+  { q: "Màu trắng đục gặp khi có nhiều __________ hoặc __________. ", a: "đạm – tiểu mủ" },
+  { q: "Màu xanh do __________ hoặc __________. ", a: "biliverdin – xanh methylene" },
+  { q: "Tỉ trọng dùng để khảo sát chức năng __________ và __________ của thận.", a: "cô đặc – pha loãng" },
+  { q: "Pha loãng tối đa của nước tiểu là __________. ", a: "1,005" },
+  { q: "Cô đặc tối đa của nước tiểu là __________. ", a: "1,030" },
+  { q: "Giới hạn tỉ trọng thường gặp là từ __________ đến __________. ", a: "1,018 – 1,027" },
+  { q: "Sinh lý làm tăng tỉ trọng gồm __________, uống __________ nước, vận động __________. ", a: "trẻ em – ít – nhiều" },
+  { q: "Sinh lý làm giảm tỉ trọng là uống __________ nước.", a: "nhiều" },
+  { q: "Bệnh lý làm tăng tỉ trọng gồm __________ và __________. ", a: "tiểu đạm – đái tháo đường" },
+  { q: "Bệnh lý làm giảm tỉ trọng gồm dùng __________, __________ nhạt, __________ mạn.", a: "thuốc lợi tiểu – đái tháo – suy thận" },
+  { q: "Nước tiểu bình thường hơi __________ với pH khoảng __________. ", a: "acid – 6" },
+  { q: "pH nước tiểu dao động từ __________ đến __________. ", a: "4,5 – 8" },
+  { q: "Nước tiểu kiềm (>6,5) gặp __________ sau bữa ăn.", a: "ngay" },
+  { q: "Nước tiểu toan (<6,5) gặp khi ăn nhiều __________ hoặc vận động __________. ", a: "thịt – nhiều" },
+  { q: "pH toan bệnh lý gặp trong __________ chuyển hóa hoặc __________ ống thận.", a: "toan – toan hóa" },
+  { q: "pH kiềm bệnh lý gặp trong __________ tiểu do __________. ", a: "nhiễm trùng – proteus" },
+  { q: "Nitrite bình thường __________ tính.", a: "âm" },
+  { q: "Nitrite dương tính gặp trong __________ đường tiết niệu.", a: "nhiễm khuẩn" },
+  { q: "Protein trong nước tiểu gồm __________ và __________. ", a: "albumin – globulin" },
+  { q: "Protein niệu bệnh lý gặp trong bệnh thận do __________, viêm __________. ", a: "đái tháo đường – cầu thận" },
+  { q: "Protein niệu còn gặp trong hội chứng __________, bệnh lý __________ thận.", a: "thận hư – ống" },
+  { q: "Tăng huyết áp __________ và tiền __________ cũng gây protein niệu.", a: "tính – sản giật" },
+  { q: "Bình thường nước tiểu __________ có đường.", a: "không" },
+  { q: "Đường niệu dương tính giả gặp với __________ và __________. ", a: "aspirin – cefalosporing" },
+  { q: "Giảm độ nhạy xét nghiệm đường niệu khi tỉ trọng __________ hoặc acid __________ cao.", a: "cao – ascorbic" },
+  { q: "Đường niệu sinh lý gặp sau bữa ăn nhiều __________ hoặc trong __________. ", a: "đường – thai kỳ" },
+  { q: "Đường niệu bệnh lý gặp trong __________, bệnh lý __________ thận.", a: "đái tháo đường – ống" },
+  { q: "Bilirubin bình thường __________ tính.", a: "âm" },
+  { q: "Bilirubin dương tính gặp trong bệnh lý __________ hoặc vàng da __________ mật.", a: "gan – tắc" },
+  { q: "Urobilinogen bình thường __________ tính.", a: "âm" },
+  { q: "Urobilinogen dương tính gặp trong bệnh lý __________. ", a: "gan" },
+  { q: "Bình thường nước tiểu __________ có ceton.", a: "không" },
+  { q: "Ceton niệu gặp trong đái tháo đường có __________ ceton acid.", a: "nhiễm" },
+  { q: "Ceton niệu còn gặp khi __________ đói lâu ngày hoặc ăn nhiều __________. ", a: "nhịn – mỡ" },
+  { q: "Bình thường nước tiểu __________ có hồng cầu.", a: "không" },
+  { q: "Hồng cầu niệu gặp trong bệnh __________ thận, viêm đường __________. ", a: "cầu – tiết niệu" },
+  { q: "Hồng cầu niệu còn gặp trong __________ niệu và __________ tiết niệu.", a: "sỏi – ung thư" },
+  { q: "Bình thường nước tiểu __________ có bạch cầu.", a: "không" },
+  { q: "Bạch cầu niệu gặp trong __________ trùng niệu và viêm __________ mạc nhiễm trùng.", a: "nhiễm – nội tâm" },
+  { q: "Cặn lắng giúp phát hiện __________, __________ và __________. ", a: "tế bào – trụ niệu – tinh thể" },
+  { q: "Cặn lắng có ý nghĩa trong viêm __________, tiết niệu và __________ đường niệu.", a: "thận – sỏi" },
+  // Phần TỐC ĐỘ LẮNG MÁU (VS)
+  { q: "VS là __________ của __________ trong máu đã được __________. ", a: "tốc độ lắng – hồng cầu – kháng đông" },
+  { q: "Trị số VS sau 1 giờ ở nam giới là __________ mm.", a: "3 – 5" },
+  { q: "Trị số VS sau 1 giờ ở nữ giới là __________ mm.", a: "4 – 7" },
+  { q: "Trị số VS sau 2 giờ ở nam giới là __________ mm.", a: "7 – 10" },
+  { q: "Trị số VS sau 2 giờ ở nữ giới là __________ mm.", a: "12 – 16" },
+  { q: "Bình thường sau 1 giờ, VS ở nam không vượt quá __________ mm.", a: "15" },
+  { q: "Bình thường sau 1 giờ, VS ở nữ không vượt quá __________ mm.", a: "20" },
+  { q: "Máu gồm hai thành phần là __________ và __________. ", a: "huyết tương – huyết cầu" },
+  { q: "Hai thành phần này có __________ khác nhau.", a: "tỷ trọng" },
+  { q: "Tỷ trọng của máu toàn phần là __________ đến __________. ", a: "1,050 – 1,060" },
+  { q: "Tỷ trọng của huyết tương là __________. ", a: "1,030" },
+  { q: "Tỷ trọng của huyết cầu là __________. ", a: "1,100" },
+  { q: "Do huyết cầu có tỷ trọng __________ hơn huyết tương nên sẽ __________ xuống.", a: "lớn – lắng" },
+  { q: "Hiện tượng lắng còn phụ thuộc vào __________ của máu.", a: "độ nhớt" },
+  { q: "Độ nhớt của máu phụ thuộc vào nồng độ __________ và số lượng __________. ", a: "protein – huyết cầu" },
+  { q: "Độ nhớt của máu toàn phần so với nước là __________ đến __________. ", a: "3,8 – 4,5/1" },
+  { q: "Độ nhớt của huyết tương so với nước là __________ đến __________. ", a: "1,6 – 1,7/1" },
+  { q: "Phương pháp thường dùng để xác định VS là phương pháp __________. ", a: "Westergreen" },
+  { q: "Máu được trộn với một tỉ lệ __________ nhất định.", a: "chất chống đông" },
+  { q: "Hỗn hợp máu được cho vào ống lắng __________. ", a: "Westergreen" },
+  { q: "Ống lắng được đặt __________ và __________. ", a: "yên – thẳng đứng" },
+  { q: "Hồng cầu sẽ lắng xuống __________ của ống.", a: "đáy" },
+  { q: "Kết quả được đọc bằng chiều cao cột __________. ", a: "huyết tương" },
+  { q: "Đơn vị đo kết quả là __________. ", a: "mm" },
+  { q: "Kết quả được đọc sau __________ giờ và __________ giờ.", a: "1 – 2" },
+  { q: "Dụng cụ lấy máu tĩnh mạch gồm __________, __________, __________ và __________. ", a: "dây garô – bơm kim – bông – cồn sát trùng" },
+  { q: "Ống nghiệm dùng trong xét nghiệm VS là ống __________. ", a: "thủy tinh" },
+  { q: "Ống lắng sử dụng là ống __________ và __________ cố định.", a: "Westergreen – giá" },
+  { q: "Dung dịch chống đông sử dụng là __________ nồng độ __________. ", a: "natricitrat – 3,8%" },
+  { q: "Dụng cụ đo thời gian là __________. ", a: "đồng hồ bấm giờ" },
+  { q: "Phương tiện bảo hộ gồm __________, __________ và __________. ", a: "găng tay – khay hạt đậu – hộp hủy kim" },
+  { q: "Trong ống nghiệm cho __________ mL dung dịch chống đông.", a: "0,4" },
+  { q: "Máu thường được lấy vào buổi __________ khi bệnh nhân __________. ", a: "sáng – đói" },
+  { q: "Trong trường hợp __________ có thể lấy máu bất cứ lúc nào.", a: "khẩn cấp" },
+  { q: "Trước khi lấy máu cần __________ để bệnh nhân yên tâm hợp tác.", a: "giải thích" },
+  { q: "Máu lấy là máu __________. ", a: "tĩnh mạch" },
+  { q: "Trước khi chọc kim cần __________ vị trí lấy máu.", a: "sát khuẩn" },
+  { q: "Garô được đặt ở vùng __________. ", a: "cánh tay" },
+  { q: "Khi xuyên kim, vát kim hướng __________. ", a: "lên trên" },
+  { q: "Lượng máu rút ra khoảng __________ mL.", a: "2" },
+  { q: "Tỉ lệ chống đông và máu là __________. ", a: "1 : 4" },
+  { q: "Tổng thể tích hỗn dịch chống đông và máu là __________ mL.", a: "2" },
+  { q: "Khi trộn máu cần lắc __________ để tránh làm __________ hồng cầu.", a: "nhẹ nhàng – vỡ" },
+  { q: "Máu được hút vào ống Westergreen đến vạch __________. ", a: "0" },
+  { q: "Ống Westergreen được đặt __________ trên giá.", a: "thẳng đứng" },
+  { q: "Mặt ống có chữ số hướng về phía __________. ", a: "người làm xét nghiệm" },
+  { q: "Đọc kết quả dựa vào chiều cao cột __________. ", a: "huyết tương" },
+  { q: "Kết quả được đọc sau __________ giờ và __________ giờ.", a: "1 – 2" },
+  { q: "Kết quả được ghi nhận và __________. ", a: "giải thích" },
+  { q: "VS phản ánh đặc tính __________ của máu.", a: "vật lý" },
+  { q: "Có nhiều yếu tố ảnh hưởng đến VS nên xét nghiệm này __________ đặc hiệu cho bệnh nào.", a: "không" },
+  { q: "VS thường tăng khi lượng __________ trong máu tăng.", a: "protein" },
+  { q: "VS thường được chỉ định trong các bệnh lý __________. ", a: "viêm nhiễm" },
+  { q: "Ví dụ các bệnh làm tăng VS gồm __________ và __________. ", a: "viêm khớp – lao" },
+  { q: "Các thành phần liên quan đến VS gồm __________, __________ và __________. ", a: "huyết tương – bạch cầu – hồng cầu" },
+  { q: "Cần trình bày các __________ ảnh hưởng đến tốc độ lắng máu.", a: "yếu tố" },
+  { q: "Cần trình bày __________ của xét nghiệm tốc độ lắng máu.", a: "ứng dụng" }
+
+// Cách dùng: nối vào mảng cũ
+  // Bạn có thể tiếp tục copy phần còn lại nếu cần, nhưng mảng trên đã bao quát hầu hết nội dung bạn paste. Nếu thiếu câu nào, báo mình bổ sung ngay nhé!
+];
+
+
+// === CHIA PHẦN ===
+const sections = [
+  { title: "Thí nghiệm thẩm thấu & hồng cầu", start: 0, end: 36 },
+  { title: "Nhóm máu & truyền máu", start: 36, end: 114 },
+  { title: "Thời gian máu chảy & đông máu", start: 114, end: 160 },
+  { title: "Công thức bạch cầu", start: 160, end: 220 },
+  { title: "Nhóm máu hệ ABO", start: 220, end: 280 },
+  { title: "Sinh lý máu & đếm hồng cầu", start: 280, end: 340 },
+  { title: "Đếm bạch cầu", start: 340, end: 400 },
+  { title: "Đếm tiểu cầu", start: 400, end: 440 },
+  { title: "Xét nghiệm nước tiểu", start: 440, end: 520 },
+  { title: "Tốc độ lắng máu (VS)", start: 520, end: questions.length }
+];
+
+let currentIndex = 0;
+let flashIndex = 0;
+let isFlipped = false;
+let examQuestions = [];       // 20 câu random
+let examAnswers = [];         // Lưu đáp án người dùng
+let examCurrent = 0;
+let examTimer;
+let timeLeft = 600;           // 10 phút = 600 giây
+
+const examQuestionEl = document.getElementById("examQuestion");
+const examInput = document.getElementById("examInput");
+const examCurrentSpan = document.getElementById("examCurrent");
+const timeLeftSpan = document.getElementById("timeLeft");
+const examResult = document.getElementById("examResult");
+const scoreText = document.getElementById("scoreText");
+const answerDetails = document.getElementById("answerDetails");
+
+const total = questions.length;
+document.getElementById("totalQuestions").textContent = total;
+document.getElementById("total").textContent = total || 0;
+
+// === CHUYỂN TRANG ===
+const navLinks = document.querySelectorAll("nav a");
+navLinks.forEach(link => {
+  link.addEventListener("click", () => {
+    navLinks.forEach(l => l.classList.remove("active"));
+    link.classList.add("active");
+
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    const pageId = "page-" + link.id.replace("nav-", "");
+    const page = document.getElementById(pageId);
+    if (page) page.classList.add("active");
+
+    // Khởi tạo tab tương ứng
+    if (link.id === "nav-dienkhuyet") initDienKhuyet();
+    if (link.id === "nav-flashcard") initFlashcard();
+    if (link.id === "nav-tiendo") initThiThu();
+  });
+});
+
+// === DARK MODE ===
+const toggleDarkBtn = document.getElementById("toggleDark");
+toggleDarkBtn.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  toggleDarkBtn.textContent = document.body.classList.contains("dark") ? "☀️ Light Mode" : "🌙 Dark Mode";
+});
+if (localStorage.getItem("darkMode") === "true") {
+  document.body.classList.add("dark");
+  toggleDarkBtn.textContent = "☀️ Light Mode";
+}
+
+// === ĐIỀN KHUYẾT (giữ nguyên các hàm của bạn) ===
+const qElement = document.getElementById("question");
+const input = document.getElementById("userInput");
+const result = document.getElementById("result");
+const currentSpan = document.getElementById("current");
+const sectionsContainer = document.getElementById("sections");
+const searchInput = document.getElementById("searchInput");
+
+function renderSections(filter = "") {
+  sectionsContainer.innerHTML = "";
+  sections.forEach(sec => {
+    const header = document.createElement("div");
+    header.className = "section-header";
+    header.textContent = sec.title;
+    header.onclick = () => header.nextElementSibling.classList.toggle("open");
+
+    const list = document.createElement("ul");
+    list.className = "question-list";
+
+    for (let i = sec.start; i < sec.end && i < total; i++) {
+      const item = questions[i];
+      if (filter && !item.q.toLowerCase().includes(filter.toLowerCase())) continue;
+
+      const li = document.createElement("li");
+      let short = item.q.replace(/__________/g, '___').substring(0, 50);
+      if (item.q.length > 50) short += '...';
+      li.innerHTML = `<span class="qnum">${i+1}.</span> ${short}`;
+      li.title = item.q;
+      li.onclick = () => { currentIndex = i; showQuestion(); };
+      list.appendChild(li);
+    }
+
+    if (list.children.length > 0) {
+      sectionsContainer.appendChild(header);
+      sectionsContainer.appendChild(list);
+    }
+  });
+  highlightActive();
+}
+
+function highlightActive() {
+  document.querySelectorAll(".question-list li").forEach(li => {
+    const num = parseInt(li.querySelector(".qnum").textContent) - 1;
+    li.classList.toggle("active", num === currentIndex);
+  });
+}
+
+function showQuestion() {
+  if (total === 0) return;
+  const item = questions[currentIndex];
+  qElement.innerHTML = item.q.replace(/__________/g, '<span class="blank">__________</span>');
+  input.value = "";
+  result.className = "";
+  result.innerHTML = "";
+  currentSpan.textContent = currentIndex + 1;
+  input.focus();
+  
+  highlightActive();
+}
+
+function normalize(str) {
+  return (str || "").trim().toLowerCase().replace(/\s+/g, " ").replace(/[()]/g, "");
+}
+
+function checkAnswer() {
+  if (total === 0) return;
+  const user = normalize(input.value);
+  const correct = normalize(questions[currentIndex].a);
+  if (user === correct) {
+    result.className = "correct";
+    result.innerHTML = "Đúng rồi! 👍";
+  } else {
+    result.className = "wrong";
+    result.innerHTML = `Sai! Đáp án đúng: <strong>${questions[currentIndex].a}</strong>`;
+  }
+}
+
+function showAnswer() {
+  if (total === 0) return;
+  result.className = "correct";
+  result.innerHTML = `Đáp án: <strong>${questions[currentIndex].a}</strong>`;
+}
+
+function next() {
+  if (total === 0) return;
+  currentIndex = (currentIndex + 1) % total;
+  showQuestion();
+}
+
+function prev() {
+  if (total === 0) return;
+  currentIndex = (currentIndex - 1 + total) % total;
+  showQuestion();
+}
+
+function shuffle() {
+  if (total === 0) return;
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  currentIndex = 0;
+  renderSections(searchInput.value);
+  showQuestion();
+}
+
+// Gán nút Điền khuyết
+document.getElementById("check").addEventListener("click", checkAnswer);
+document.getElementById("show").addEventListener("click", showAnswer);
+document.getElementById("next").addEventListener("click", next);
+document.getElementById("prev").addEventListener("click", prev);
+document.getElementById("shuffle").addEventListener("click", shuffle);
+
+input.addEventListener("keyup", (e) => {
+  if (e.key === "Enter") checkAnswer();
+});
+
+if (searchInput) searchInput.addEventListener("input", () => renderSections(searchInput.value));
+
+function initDienKhuyet() {
+  renderSections();
+  showQuestion();
+}
+
+// === FLASHCARD ===
+const flashcard = document.getElementById("flashcard");
+const flashSearchInput = document.getElementById("flashSearchInput");
+const flashSections = document.getElementById("flashSections");
+
+function renderFlashSections(filter = "") {
+  flashSections.innerHTML = "";
+  sections.forEach(sec => {
+    const header = document.createElement("div");
+    header.className = "section-header";
+    header.textContent = sec.title;
+    header.onclick = () => header.nextElementSibling.classList.toggle("open");
+
+    const list = document.createElement("ul");
+    list.className = "question-list";
+
+    for (let i = sec.start; i < sec.end && i < total; i++) {
+      const item = questions[i];
+      if (filter && !item.q.toLowerCase().includes(filter.toLowerCase())) continue;
+
+      const li = document.createElement("li");
+      let short = item.q.replace(/__________/g, '___').substring(0, 50);
+      if (item.q.length > 50) short += '...';
+      li.innerHTML = `<span class="qnum">${i+1}.</span> ${short}`;
+      li.title = item.q;
+      li.onclick = () => {
+        flashIndex = i;
+        isFlipped = false;
+        showFlashcard();
+
+        // Highlight chỉ trong danh sách flashcard
+        document.querySelectorAll("#flashSections .question-list li").forEach(l => l.classList.remove("active"));
+        li.classList.add("active");
+
+        // Không scrollIntoView nữa → card giữ nguyên vị trí
+      };
+      list.appendChild(li);
+    }
+
+    if (list.children.length > 0) {
+      flashSections.appendChild(header);
+      flashSections.appendChild(list);
+    }
+  });
+}
+
+function showFlashcard() {
+  if (total === 0) {
+    flashcard.textContent = "Chưa có câu hỏi.";
+    return;
+  }
+  flashcard.className = isFlipped ? "back" : "front";
+  flashcard.textContent = isFlipped ? questions[flashIndex].a : questions[flashIndex].q.replace(/__________/g, '___');
+}
+
+flashcard.onclick = () => { isFlipped = !isFlipped; showFlashcard(); };
+document.getElementById("flashFlip").addEventListener("click", () => { isFlipped = !isFlipped; showFlashcard(); });
+document.getElementById("flashNext").addEventListener("click", () => { 
+  flashIndex = (flashIndex + 1) % total; 
+  isFlipped = false; 
+  showFlashcard(); 
+});
+document.getElementById("flashPrev").addEventListener("click", () => { 
+  flashIndex = (flashIndex - 1 + total) % total; 
+  isFlipped = false; 
+  showFlashcard(); 
+});
+document.getElementById("flashShuffle").addEventListener("click", () => { 
+  flashIndex = Math.floor(Math.random() * total); 
+  isFlipped = false; 
+  showFlashcard(); 
+});
+
+if (flashSearchInput) {
+  flashSearchInput.addEventListener("input", () => renderFlashSections(flashSearchInput.value));
+}
+
+function initFlashcard() {
+  renderFlashSections();
+  showFlashcard();
+}
+
+// === KHỞI TẠO BAN ĐẦU ===
+initDienKhuyet(); // Mặc định load Điền khuyết
+
+// Bắt đầu thi thử
+function startExam() {
+  // Random 20 câu không trùng
+  examQuestions = [];
+  let indices = Array.from({length: questions.length}, (_, i) => i);
+  indices.sort(() => Math.random() - 0.5);
+  examQuestions = indices.slice(0, 20).map(i => questions[i]);
+
+  examAnswers = new Array(20).fill("");
+  examCurrent = 0;
+  timeLeft = 600;
+  updateTimer();
+
+  examResult.style.display = "none";
+  document.querySelector("#page-tiendo .buttons").style.display = "flex";
+  showExamQuestion();
+
+  // Đếm ngược
+  clearInterval(examTimer);
+  examTimer = setInterval(() => {
+    timeLeft--;
+    updateTimer();
+    if (timeLeft <= 0) {
+      clearInterval(examTimer);
+      submitExam();
+    }
+  }, 1000);
+}
+
+function updateTimer() {
+  const min = Math.floor(timeLeft / 60);
+  const sec = timeLeft % 60;
+  timeLeftSpan.textContent = `${min}:${sec < 10 ? "0" : ""}${sec}`;
+  timeLeftSpan.style.color = timeLeft <= 60 ? "#ef4444" : "#1e40af";
+}
+
+function showExamQuestion() {
+  if (examQuestions.length === 0) return;
+  const item = examQuestions[examCurrent];
+  examQuestionEl.innerHTML = item.q.replace(/__________/g, '<span class="blank">__________</span>');
+  examInput.value = examAnswers[examCurrent] || "";
+  examCurrentSpan.textContent = examCurrent + 1;
+  examInput.focus();
+}
+
+function saveAnswer() {
+  examAnswers[examCurrent] = examInput.value.trim();
+}
+
+// Nút điều hướng
+document.getElementById("examPrev").addEventListener("click", () => {
+  if (examCurrent > 0) {
+    saveAnswer();
+    examCurrent--;
+    showExamQuestion();
+  }
+});
+
+document.getElementById("examNext").addEventListener("click", () => {
+  if (examCurrent < 19) {
+    saveAnswer();
+    examCurrent++;
+    showExamQuestion();
+  }
+});
+
+document.getElementById("examCheck").addEventListener("click", () => {
+  saveAnswer();
+  const user = normalize(examInput.value);
+  const correct = normalize(examQuestions[examCurrent].a);
+  if (user === correct) {
+    alert("Đúng rồi! 👍");
+  } else {
+    alert(`Sai! Đáp án đúng: ${examQuestions[examCurrent].a}`);
+  }
+});
+
+document.getElementById("examShow").addEventListener("click", () => {
+  alert(`Đáp án: ${examQuestions[examCurrent].a}`);
+});
+
+// Nộp bài
+function submitExam() {
+  clearInterval(examTimer);
+  saveAnswer();
+
+  let correctCount = 0;
+  answerDetails.innerHTML = "";
+
+  examQuestions.forEach((q, i) => {
+    const userAns = normalize(examAnswers[i]);
+    const correctAns = normalize(q.a);
+    const isCorrect = userAns === correctAns;
+    if (isCorrect) correctCount++;
+
+    const item = document.createElement("div");
+    item.className = "answer-item " + (isCorrect ? "answer-correct" : "answer-wrong");
+    item.innerHTML = `
+      <strong>Câu ${i+1}:</strong> ${q.q.replace(/__________/g, '___')}<br>
+      Bạn trả lời: <strong>${examAnswers[i] || "(trống)"}</strong><br>
+      Đáp án đúng: <strong>${q.a}</strong>
+    `;
+    answerDetails.appendChild(item);
+  });
+
+  const percent = Math.round((correctCount / 20) * 100);
+  scoreText.innerHTML = `Điểm: <strong>${correctCount}/20</strong> (${percent}%)`;
+  examResult.style.display = "block";
+  document.querySelector("#page-tiendo .buttons").style.display = "none";
+}
+
+document.getElementById("submitExam").addEventListener("click", submitExam);
+
+// Thi lại
+document.getElementById("restartExam").addEventListener("click", startExam);
+
+// === KHỞI TẠO THI THỬ ===
+function initThiThu() {
+  startExam();
+}
+
+// === ÔN THEO BỘ ĐỀ ===
+const questionsPerBo = 50; // Số câu mỗi bộ - bạn có thể chỉnh thành 30, 40, v.v.
+let currentBo = 0;         // Bộ đề đang ôn (0-based)
+let currentInBoIndex = 0;  // Chỉ số câu trong bộ hiện tại
+
+function getTotalBo() {
+  return Math.ceil(questions.length / questionsPerBo);
+}
+
+function renderBoDeList() {
+  const list = document.getElementById("boDeList");
+  list.innerHTML = "";
+  const totalBo = getTotalBo();
+
+  for (let i = 0; i < totalBo; i++) {
+    const start = i * questionsPerBo;
+    const end = Math.min(start + questionsPerBo, questions.length);
+    const item = document.createElement("div");
+    item.className = "bo-de-item";
+    item.textContent = `Bộ ${i+1}: Câu ${start+1} - ${end}`;
+    item.onclick = () => {
+      currentBo = i;
+      currentInBoIndex = 0;
+      showBoDeQuestion();
+      document.querySelectorAll("#boDeList .bo-de-item").forEach(el => el.classList.remove("active"));
+      item.classList.add("active");
+    };
+    list.appendChild(item);
+  }
+}
+
+function showBoDeQuestion() {
+  const start = currentBo * questionsPerBo;
+  const index = start + currentInBoIndex;
+  if (index >= questions.length) return;
+
+  const item = questions[index];
+  document.getElementById("boDeQuestion").innerHTML = item.q.replace(/__________/g, '<span class="blank">__________</span>');
+  document.getElementById("boDeInput").value = "";
+  document.getElementById("currentInBo").textContent = currentInBoIndex + 1;
+  document.getElementById("totalInBo").textContent = Math.min(questionsPerBo, questions.length - start);
+  document.getElementById("boDeCurrent").textContent = currentBo + 1;
+  document.getElementById("boDeResult").innerHTML = "";
+  document.getElementById("boDeInput").focus();
+}
+
+function boDeCheck() {
+  const start = currentBo * questionsPerBo;
+  const index = start + currentInBoIndex;
+  const user = normalize(document.getElementById("boDeInput").value);
+  const correct = normalize(questions[index].a);
+
+  const result = document.getElementById("boDeResult");
+  if (user === correct) {
+    result.className = "correct";
+    result.innerHTML = "Đúng rồi! 👍";
+  } else {
+    result.className = "wrong";
+    result.innerHTML = `Sai! Đáp án đúng: <strong>${questions[index].a}</strong>`;
+  }
+}
+
+function boDeShow() {
+  const start = currentBo * questionsPerBo;
+  const index = start + currentInBoIndex;
+  document.getElementById("boDeResult").className = "correct";
+  document.getElementById("boDeResult").innerHTML = `Đáp án: <strong>${questions[index].a}</strong>`;
+}
+
+function boDeNext() {
+  const start = currentBo * questionsPerBo;
+  if (currentInBoIndex < Math.min(questionsPerBo, questions.length - start) - 1) {
+    currentInBoIndex++;
+    showBoDeQuestion();
+  }
+}
+
+function boDePrev() {
+  if (currentInBoIndex > 0) {
+    currentInBoIndex--;
+    showBoDeQuestion();
+  }
+}
+
+// Gán sự kiện nút
+document.getElementById("boDeCheck")?.addEventListener("click", boDeCheck);
+document.getElementById("boDeShow")?.addEventListener("click", boDeShow);
+document.getElementById("boDeNext")?.addEventListener("click", boDeNext);
+document.getElementById("boDePrev")?.addEventListener("click", boDePrev);
+
+document.getElementById("boDeInput")?.addEventListener("keyup", (e) => {
+  if (e.key === "Enter") boDeCheck();
+});
+
+// Khởi tạo khi chuyển tab
+if (document.getElementById("nav-bode")) {
+  navLinks.forEach(link => {
+    link.addEventListener("click", () => {
+      // ... code chuyển tab cũ ...
+      if (link.id === "nav-bode") {
+        renderBoDeList();
+        // Tự động chọn bộ 1 đầu tiên
+        document.querySelector("#boDeList .bo-de-item")?.click();
+      }
+    });
+  });
+}
+
+</script>
+</body>
+</html>
